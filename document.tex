@@ -1,0 +1,209 @@
+%!TEX options = --shell-escape
+\documentclass[oneside,open=any,12pt,DIV=8]{scrreprt}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage{XCharter}
+%\usepackage[rm]{roboto}
+%\usepackage[default]{droidserif}
+\usepackage{FiraSans}
+\usepackage{inconsolata}
+\usepackage{setspace}
+\usepackage{microtype}
+
+\usepackage[T1]{fontenc}
+\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+
+\usepackage{tikz}
+\usepackage{blindtext}
+\usepackage{csquotes}
+
+\usepackage[letterpaper,left=1in,top=1in,headsep=2\baselineskip,textwidth=26pc,marginparsep=2pc,marginparwidth=12pc,textheight=44\baselineskip,headheight=\baselineskip]{geometry}
+
+\usepackage{lettrine}
+\renewcommand{\LettrineFontHook}{\titlefont\color{Black}\rmfamily}
+\setlength{\DefaultNindent}{0pt}
+\setlength{\DefaultFindent}{4pt}
+%\renewcommand{\LettrineFontHook}{\fontfamily{bch}}
+
+
+%minted
+\usepackage[newfloat]{minted}
+\setminted{tabsize=4}
+\setminted{obeytabs}
+\setminted{linenos}
+\setminted{bgcolor=listingbackground}
+\setmintedinline{breaklines}
+\setmintedinline{bgcolor={}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%		Tables
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\definecolor{lightGray}{RGB}{150, 150, 150}
+\usepackage{array}
+\usepackage{tabu}
+\usepackage{longtable}
+
+\definecolor{tableHeader}{RGB}{211, 47, 0}
+\definecolor{listingbackground}{HTML}{F4F4F4}
+\definecolor{tableLineOne}{RGB}{245, 245, 245}
+\definecolor{tableLineTwo}{RGB}{224, 224, 224}
+\definecolor{THI-Blue}{RGB}{1,90,156}
+\colorlet{documentColor}{BrickRed}
+\colorlet{tableHeader}{documentColor}
+
+
+%Titel
+\title{Netzwerkforensik: Erkennung von SQL-Injections}
+%\publishers{TH Ingolstadt}
+\subtitle{Computerforensik}
+\author{Stefan Braun}
+\date{23. Mai 2016}
+
+\addtokomafont{chapter}{\normalfont\sffamily\color{documentColor}}
+\addtokomafont{section}{\normalfont\sffamily\color{documentColor}}
+\addtokomafont{subsection}{\normalfont\sffamily\color{documentColor}}
+\addtokomafont{subsubsection}{\normalfont\sffamily\color{documentColor}}
+\addtokomafont{paragraph}{\normalfont\sffamily\color{documentColor}}
+\addtokomafont{title}{\normalfont\sffamily\color{documentColor}}
+\addtokomafont{captionlabel}{\bfseries\sffamily\color{documentColor}}
+\addtokomafont{pageheadfoot}{\footnotesize\normalfont\sffamily\color{black!55}}
+\addtokomafont{pagenumber}{\footnotesize\normalfont\sffamily\color{black!55}}
+\addtokomafont{caption}{\sffamily\footnotesize\color{black!67}}
+
+
+\usepackage{url}
+
+\usepackage[labelsep=colon]{caption}
+\DeclareCaptionLabelSeparator{newlinesep}{ \\ }
+\captionsetup{
+  labelsep=newlinesep
+}
+
+
+\usepackage{mcaption}
+\usepackage{float}
+\usepackage{ragged2e}
+\captionsetup{format=plain}
+\captionsetup[margincap]{indention=0pt,justification=justified}
+
+
+\usepackage{marginnote}
+% \renewcommand{\raggedleftmarginnote}{\justified}
+% \renewcommand{\raggedrightmarginnote}{\justified}
+\newcommand\mymarginnote[1]{
+  \marginnote{% needs marginnote package
+    \lineskiplimit=-\maxdimen%
+    \normalfont\sffamily\footnotesize\color{black!70}%
+    \justify
+    \noindent
+    #1
+    }%
+}
+
+
+\usepackage{eso-pic}
+\newcommand\BackgroundPic{%
+\put(0,-180){%
+\parbox[b][\paperheight]{\paperwidth}{%
+\vfill
+\centering
+\includegraphics[width=0.3\paperwidth,height=\paperheight,%
+keepaspectratio]{imports/thi_logo.eps}
+\vfill
+}}}
+
+\setlength{\emergencystretch}{0.5em}
+
+% section numbers in margin
+\renewcommand\sectionlinesformat[4]{%
+  \makebox[0pt][r]{#3}#4%
+}
+
+
+\usepackage[automark,markcase=upper]{scrlayer-scrpage}
+\clearpairofpagestyles
+\automark{chapter}
+\ohead{\headmark~~~~\pagemark\hspace*{-4.5cm}}
+\renewcommand*{\chaptermarkformat}{}
+
+
+\begin{document}
+
+
+\everyrow{\tabucline[.4mm  white]{}}
+\taburowcolors[2] 2{tableLineOne .. tableLineTwo}
+\tabulinesep = ^4mm_3mm
+
+
+
+\newgeometry{margin=1in}
+\AddToShipoutPicture*{\BackgroundPic}
+\maketitle
+\clearpage
+\newgeometry{left=24.8mm,top=27.4mm,headsep=2\baselineskip,textwidth=127mm,marginparsep=8mm,marginparwidth=48mm,textheight=43\baselineskip,headheight=\baselineskip}
+%wegen marginnote
+\edef\marginnotetextwidth{\the\textwidth}
+
+
+\tableofcontents
+\chapter{SQL-Injections im Jahr 2016}
+
+\mymarginnote{Derzeit werden Daten für die kommende OWASP Top Ten 2016 gesammelt.}
+\lettrine[lines=2]{A}{}lle drei Jahre veröffentlicht das \emph{Open Web Application Security Project} -- kurz OWASP -- eine Liste der derzeit als am kritischsten eingestuften Sicherheitsrisiken in Webapplikationen. Und auch in der derzeit aktuellsten Fassung der Liste aus dem Jahr 2013 findet sich die Kategorie \enquote{Injections} auf Platz Eins wieder.
+
+\begin{table}[ht!]
+\begin{margincap}
+\caption{Die ersten drei Kategorien der aktuellen OWASP Top Ten aus dem Jahr 2013, nach \texttt{www.owasp.org}}
+\label{tab:owasp_top_ten}
+\centering
+\begin{tabu} to 0.7\textwidth {l l X l}
+	\rowfont{\sffamily\bfseries\leavevmode\color{white}}
+	\rowcolor{tableHeader}
+	& & Kategorie & \\
+	\rowfont{\sffamily}
+	& 1 & Injection & \\
+	\rowfont{\sffamily}
+	& 2 & Broken Authentication & \\
+	\rowfont{\sffamily}
+	& 3 & Cross-Site-Scripting & \\
+\end{tabu}
+\end{margincap}
+\end{table}
+
+Derartige Angriffe basieren darauf, dass Benutzereingaben ungeprüft in Abfragen an LDAP"=Dienste und vor allem SQL"=Datenbanken als Parameter eingefügt werden. Entsprechend geformte Eingaben können somit die grundlegende Struktur der Anfrage manipulieren. Diese Manipulation kann Verlust der Informationsvertraulichkeit oder der Datenintegrität zur Folge haben, unter Umständen kann ein Angreifer Vollzugriff auf die zugrundeliegende Serverstruktur erhalten. Die vorliegende Arbeit konzentriert sich hierbei insbesondere auf gefährdete SQL"=Anfragen.
+
+
+\mymarginnote{\enquote{Don't trust user input.}}
+Es stellt sich folglich die Frage, wie derartige Angriffe verhindert werden können. Die übliche Vorgehensweise stellt hierbei die Überprüfung der vom Client übergebenen Parameter dar. Etwa könnte unter PHP ein Parameter, für den nur Ganzzahlen vorgesehen sind, per Konvertierung durch \mintinline{php}{intval()} abgesichert werden. \mymarginnote{Diese PHP"=Funktion ersetzt beispielsweise ' durch \textbackslash'.  Dadurch wird es erschwert, das aktuelle String"=Literal im SQL"=Statement zu beenden und zusätzliche Befehle anzufügen.} Bei beliebigen Zeichenketten escaped die Funktion \mintinline{php}{mysql_real_escape_string()} bestimmte Zeichen, die einen Ausbruch aus der Abfrage erlauben können. Sicherer sind allerdings sogenannte \emph{Prepared Statements}, die die Anfrage und die zugehörigen Parameter getrennt voneinander übertragen und dadurch Injections verhindern.
+
+Wenn also die Verhinderung von SQL"=Injections eine triviale Angelegenheit ist, weshalb bestimmen auch heutzutage Nachrichten über aktuelle, derartige Angriffe die Fachpresse? Die Gründe hierfür sind vielfältig. Möglicherweise ist veraltete Software im Einsatz oder dem Entwickler mangelt es schlicht an Vorwissen im Bereich der IT"=Sicherheit.
+\mymarginnote{Ein weiteres Beispiel könnte zugekaufte Fremdsoftware darstellen, die im eigenen Netzwerk betrieben wird.}
+Ebenfalls vorstellbar ist Software, die nicht mehr geändert werden kann -- etwa weil der Aufwand zu groß wäre, keine Entwickler vorhanden sind, oder aber der zugehörige Sourcecode nicht zur Verfügung steht.
+
+Außerdem können Queries konstruiert werden, die ein fachliches Problem zwar auf einfache Weise lösen, andererseits jedoch die Verwendung eines parametrisierten Prepared Statements unmöglich machen.
+
+\begin{listing}[ht!]
+\begin{margincap}
+\begin{minted}[startinline,obeytabs]{php}
+$query  = ""
+    ."SELECT                        "
+    ."    $choosenText AS myText,   "
+    ."    name                      "
+    ."FROM                          "
+    ."    report                    "
+    ."ORDER BY                      "
+    ."    name $sorting             ";
+mssql_query($query);
+\end{minted}
+\caption{In diesem PHP"=Code wird mit der Variable \mintinline{php}{choosenText} eine Spalte und mit \mintinline{php}{sorting} eine Sortierreihenfolge ausgewählt. In beiden Fällen können keine Parameter für Prepared Statements verwendet werden.}
+\label{lst:strange_query}
+\end{margincap}
+\end{listing}
+
+\mymarginnote{Ein Beispiel hierfür stellen etwa \emph{Load Balancer} zur Lastverteilung auf mehrere Server dar.}
+In aktuellen Webserverarchitekturen können weitere Komponenten enthalten sein, die an dieser Stelle jedoch vernachlässigt und abstrahiert werden sollen.
+
+
+
+\end{document}
