@@ -16,8 +16,24 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %tikz
+\def\pgfsysdriver{pgfsys-pdftex.def} %for texlive 2016
 \usepackage{tikz}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usetikzlibrary{positioning}
+\usetikzlibrary{arrows}
+\usetikzlibrary{calc}
+\usetikzlibrary{shadows.blur}
+\usepackage{tikz-3dplot}
+\definecolor{Gray}{HTML}{444444}
+\definecolor{myGray}{HTML}{23373b}
+\usetikzlibrary{arrows.meta}
+
+\usetikzlibrary{
+    shapes,
+    shapes.symbols}
+
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\pgfplotsset{compat=newest}%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -33,6 +49,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %minted
 \usepackage[newfloat]{minted}
+\usemintedstyle{manni}
 \setminted{tabsize=4}
 \setminted{obeytabs}
 \setminted{linenos}
