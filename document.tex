@@ -1,9 +1,8 @@
 %!TEX options = --shell-escape
 \input{imports/def}
 
+
 \begin{document}
-
-
 
 \tableofcontents
 \chapter{SQL-Injections im Jahr 2016}
@@ -60,8 +59,36 @@ mssql_query($query);
 \end{margincap}
 \end{listing}
 
+In all diesen Fällen muss die gefährdete Applikation also auf andere Art und Weise abgesichert werden. Ein gängiger Ansatz zur Realisierung einer solchen Schutzmaßnahme stellt eine vorgeschaltene Softwarekomponenta dar, welche auf Basis von Filterregeln einzelne Requests verwirft oder modifiziert. Hierzu soll zuerst ein übliches Schema einer Client"=Server"=Architektur skizziert werden.
+
+\begin{figure}[ht!]
+\begin{margincap}
+\centering
+\begin{tikzpicture}[every node/.style={ultra thick,draw=black!60, font=\large\sffamily\color{black!60},inner sep=8pt,text height=1.5ex,text depth=.25ex,node distance=1.2cm,}]
+\node(hacker) {Hacker};
+\node[right = of hacker.east, minimum width = 3pt,fill=documentColor, minimum height=3cm](firewall)  {};
+\node[below =0.1cm of firewall.south,draw=none] {Firewall};
+
+
+\node[right = of firewall.east](server)  {Webserver};
+\node[right = of server.east](app)  {Anwendung};
+\node[below = of app.south](db)  {Datenbank};
+
+
+\draw[ultra thick,draw=black!60,] (hacker) -- (firewall) -- (server) -- (app) -- (db);
+\end{tikzpicture}
+
+\caption{Zugriffe auf eine Webserverapplikation passieren üblicherweise zuerst eine Firewall und werden anschließend von einem Webserver -- etwa \emph{Apache} -- zur Applikation weitergeleitet. Diese Applikation kann anschließend auf den Datenbankserver zugreifen.}
+\label{img:server_arch}
+\end{margincap}
+\end{figure}
+
+%TODO Logging --> passives Verhalten, um noch nicht entdeckte Schwachstellen aufzudecken
+
 \mymarginnote{Ein Beispiel hierfür stellen etwa \emph{Load Balancer} zur Lastverteilung auf mehrere Server dar.}
 In aktuellen Webserverarchitekturen können weitere Komponenten enthalten sein, die an dieser Stelle jedoch vernachlässigt und abstrahiert werden sollen.
+
+In dem abstrakten Schema eines Requests aus Abbildung \ref{img:server_arch} bieten sich zwei Stellen an, an welchen einzelne Parameter der Anfrage auf ihre Gefährlichkeit in Bezug auf SQL"=Injections hin untersucht werden können. Analysiert man die beispielsweise die GET und POST Parameter eines Requests noch bevor sie beim Webserver ankommt, spricht man von einer \emph{Web Application Firewall}. Alternativ können auch die Zugriffe auf den Datenbankserver selbst untersucht werden -- und zwar von einer vorgeschaltenen \emph{Datenbank"=Firewall.}
 
 
 
