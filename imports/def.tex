@@ -13,6 +13,7 @@
 \usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
 \usepackage{csquotes}
 \usepackage[letterpaper,left=1in,top=1in,headsep=2\baselineskip,textwidth=26pc,marginparsep=2pc,marginparwidth=12pc,textheight=44\baselineskip,headheight=\baselineskip]{geometry}
+\usepackage{blindtext}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %tikz
@@ -33,13 +34,43 @@
 
 \usepackage{pgfplots}
 \usepackage{pgfplotstable}
-\pgfplotsset{compat=newest}%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pgfplotsset{compat=newest}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% TOC
+\usepackage{titletoc,etoolbox,framed}
+\patchcmd{\tableofcontents}{\contentsname}{\sffamily\contentsname}{}{}
+
+\renewenvironment{leftbar}
+  {\def\FrameCommand{\hspace{6em}%
+    {\color{black!70}\vrule width 2pt depth 6pt}\hspace{1em}}%
+    \MakeFramed{\parshape 1 0cm \dimexpr\textwidth-6em\relax\FrameRestore}\vskip2pt%
+  }
+ {\endMakeFramed}
+
+\titlecontents{chapter}
+  [0em]{\vspace*{2\baselineskip}}
+  {\parbox{4.5em}{%
+    \hfill\Huge\sffamily\bfseries\color{documentColor}\thecontentspage}%
+   \vspace*{-2.3\baselineskip}\leftbar\MakeUppercase{\sffamily\color{black!60}\small\chaptername~\thecontentslabel}\\\sffamily}
+  {}{\endleftbar}
+\titlecontents{section}
+  [8.4em]
+  {\sffamily\contentslabel{3em}}{}{}
+  {\hspace{0.5em}\nobreak\itshape\color{documentColor}\contentspage}
+\titlecontents{subsection}
+  [8.4em]
+  {\sffamily\contentslabel{3em}}{}{}
+  {\hspace{0.5em}\nobreak\itshape\color{documentColor}\contentspage}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Big letters at the beginning of a chapter
 \usepackage{lettrine}
-\renewcommand{\LettrineFontHook}{\titlefont\color{Black}\rmfamily}
+\renewcommand{\LettrineFontHook}{\titlefont\color{black}\rmfamily}
 \setlength{\DefaultNindent}{0pt}
 \setlength{\DefaultFindent}{4pt}
 %\renewcommand{\LettrineFontHook}{\fontfamily{bch}}
@@ -75,8 +106,9 @@
 \definecolor{tableLineOne}{RGB}{245, 245, 245}
 \definecolor{tableLineTwo}{RGB}{224, 224, 224}
 \definecolor{THI-Blue}{RGB}{1,90,156}
-\colorlet{documentColor}{BrickRed}
-\colorlet{tableHeader}{documentColor}
+\definecolor{darkred}{rgb}{0.70, 0.0, 0.0}
+\colorlet{BLACK}{black}
+\colorlet{documentColor}{darkred}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -128,14 +160,14 @@
 \usepackage{marginnote}
 % \renewcommand{\raggedleftmarginnote}{\justified}
 % \renewcommand{\raggedrightmarginnote}{\justified}
-\newcommand\mymarginnote[1]{
+\newcommand\mymarginnote[2][0pt]{
   \marginnote{% needs marginnote package
     \lineskiplimit=-\maxdimen%
     \normalfont\sffamily\footnotesize\color{black!70}%
     \justify
     \noindent
-    #1
-    }%
+    #2
+    }[#1]%
 }
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -169,10 +201,29 @@ keepaspectratio]{imports/thi_logo.eps}
 % Header
 \usepackage[automark,markcase=upper]{scrlayer-scrpage}
 \clearpairofpagestyles
-% only chapters
-\automark{chapter}
+% % only chapters
+% \automark{chapter}
+% \automark*{section}
+\pagestyle{headings}
+
 % page number on top
-\ohead{\headmark~~~~\pagemark\hspace*{-4.5cm}}
+\newlength{\ruleWidth}
+\setlength{\ruleWidth}{1.5pt}
+\newlength{\pageNumperSpace}
+\setlength{\pageNumperSpace}{20pt}
+\newlength{\pageNumberHeaderSkip}
+\setlength{\pageNumberHeaderSkip}{-\marginparwidth-\marginparsep-12pt}
+\newlength{\chapterHeaderSkip}
+\setlength{\chapterHeaderSkip}{\pageNumberHeaderSkip+0.5em+\pageNumperSpace+\ruleWidth}
+% \ohead{\headmark~~~{\color{documentColor}\rule[-0.2em]{1.5pt}{1.2em}}~~~\pagemark\hspace*{-4.5cm}}
+
+
+% \ohead{{\headmark~~~\color{documentColor}{\rule[-4pt]{\ruleWidth}{\voffset+\topmargin+\headheight+1in}}}\makebox[\pageNumperSpace][c]{\oldstylenums\pagemark}\hspace{\pageNumberHeaderSkip}}
+
+\rohead{\smash{\textcolor{documentColor}{\rule[-4pt]{\ruleWidth}{\voffset+\topmargin+\headheight+1in}}}\makebox[\pageNumperSpace][c]{\oldstylenums\pagemark}\hspace{\pageNumberHeaderSkip}}
+\lehead{\hspace{\pageNumberHeaderSkip}\makebox[\pageNumperSpace][c]{\oldstylenums\pagemark}\smash{\textcolor{documentColor}{\rule[-4pt]{\ruleWidth}{\voffset+\topmargin+\headheight+1in}}}}
+\cohead{\raggedleft{\headmark} \hspace{\chapterHeaderSkip}}
+\cehead{\hspace{\chapterHeaderSkip} \raggedright{\headmark} }
 % no chapter number in header
 \renewcommand*{\chaptermarkformat}{}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -184,13 +235,14 @@ keepaspectratio]{imports/thi_logo.eps}
 %settings for flat tables
 \everyrow{\tabucline[.4mm  white]{}}
 \taburowcolors[2] 2{tableLineOne .. tableLineTwo}
-\tabulinesep = ^4mm_3mm
+\tabulinesep = ^3mm_2mm
+
 % center geometry on maketitle
 \newgeometry{margin=1in}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% colors
+\colorlet{tableHeader}{documentColor}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %title page
 \AddToShipoutPicture*{\BackgroundPic}
 \maketitle

@@ -1,13 +1,12 @@
 %!TEX options = --shell-escape
 \input{imports/def}
 
-
 \begin{document}
 
 \tableofcontents
 \chapter{SQL-Injections im Jahr 2016}
 
-\mymarginnote{Derzeit werden Daten für die kommende OWASP Top Ten 2016 gesammelt.}
+\mymarginnote[-2em]{Derzeit werden Daten für die kommende OWASP Top Ten 2016 gesammelt.}
 \lettrine[lines=2]{A}{}lle drei Jahre veröffentlicht das \emph{Open Web Application Security Project} -- kurz OWASP -- eine Liste der derzeit als am kritischsten eingestuften Sicherheitsrisiken in Webapplikationen. Und auch in der derzeit aktuellsten Fassung der Liste aus dem Jahr 2013 findet sich die Kategorie \enquote{Injections} auf Platz Eins wieder.
 
 \begin{table}[ht!]
@@ -15,7 +14,7 @@
 \caption{Die ersten drei Kategorien der aktuellen OWASP Top Ten aus dem Jahr 2013, nach \texttt{www.owasp.org}}
 \label{tab:owasp_top_ten}
 \centering
-\begin{tabu} to 0.7\textwidth {l l X l}
+\begin{tabu} to \textwidth {l l X<{\strut} l}
 	\rowfont{\sffamily\bfseries\leavevmode\color{white}}
 	\rowcolor{tableHeader}
 	& & Kategorie & \\
@@ -31,12 +30,13 @@
 
 Derartige Angriffe basieren darauf, dass Benutzereingaben ungeprüft in Abfragen an LDAP"=Dienste und vor allem SQL"=Datenbanken als Parameter eingefügt werden. Entsprechend geformte Eingaben können somit die grundlegende Struktur der Anfrage manipulieren. Diese Manipulation kann Verlust der Informationsvertraulichkeit oder der Datenintegrität zur Folge haben, unter Umständen kann ein Angreifer Vollzugriff auf die zugrundeliegende Serverstruktur erhalten. Die vorliegende Arbeit konzentriert sich hierbei insbesondere auf gefährdete SQL"=Anfragen.
 
+\section{Verhinderung von SQL"=Injections}
 
-\mymarginnote{\enquote{Don't trust user input.}}
-Es stellt sich folglich die Frage, wie derartige Angriffe verhindert werden können. Die übliche Vorgehensweise stellt hierbei die Überprüfung der vom Client übergebenen Parameter dar. Etwa könnte unter PHP ein Parameter, für den nur Ganzzahlen vorgesehen sind, per Konvertierung durch \mintinline{php}{intval()} abgesichert werden. \mymarginnote{Diese PHP"=Funktion ersetzt beispielsweise ' durch \textbackslash'.  Dadurch wird es erschwert, das aktuelle String"=Literal im SQL"=Statement zu beenden und zusätzliche Befehle anzufügen.} Bei beliebigen Zeichenketten escaped die Funktion \mintinline{php}{mysql_real_escape_string()} bestimmte Zeichen, die einen Ausbruch aus der Abfrage erlauben können. Sicherer sind allerdings sogenannte \emph{Prepared Statements}, die die Anfrage und die zugehörigen Parameter getrennt voneinander übertragen und dadurch Injections verhindern.
+\mymarginnote[0em]{\enquote{Don't trust user input.}}
+Es stellt sich folglich die Frage, wie derartige Angriffe verhindert werden können. Die übliche Vorgehensweise stellt hierbei die Überprüfung der vom Client übergebenen Parameter dar. Etwa könnte unter PHP ein Parameter, für den nur Ganzzahlen vorgesehen sind, per Konvertierung durch \mintinline{php}{intval()} abgesichert werden. \mymarginnote[-2em]{Diese PHP"=Funktion ersetzt beispielsweise ' durch \textbackslash'.  Dadurch wird es erschwert, das aktuelle String"=Literal im SQL"=Statement zu beenden und zusätzliche Befehle anzufügen.} Bei beliebigen Zeichenketten escaped die Funktion \mintinline{php}{mysql_real_escape_string()} bestimmte Zeichen, die einen Ausbruch aus der Abfrage erlauben können. Sicherer sind allerdings sogenannte \emph{Prepared Statements}, die die Anfrage und die zugehörigen Parameter getrennt voneinander übertragen und dadurch Injections verhindern.
 
 Wenn also die Verhinderung von SQL"=Injections eine triviale Angelegenheit ist, weshalb bestimmen auch heutzutage Nachrichten über aktuelle, derartige Angriffe die Fachpresse? Die Gründe hierfür sind vielfältig. Möglicherweise ist veraltete Software im Einsatz oder dem Entwickler mangelt es schlicht an Vorwissen im Bereich der IT"=Sicherheit.
-\mymarginnote{Ein weiteres Beispiel könnte zugekaufte Fremdsoftware darstellen, die im eigenen Netzwerk betrieben wird.}
+\mymarginnote[-3em]{Ein weiteres Beispiel könnte zugekaufte Fremdsoftware darstellen, die im eigenen Netzwerk betrieben wird.}
 Ebenfalls vorstellbar ist Software, die nicht mehr geändert werden kann -- etwa weil der Aufwand zu groß wäre, keine Entwickler vorhanden sind, oder aber der zugehörige Sourcecode nicht zur Verfügung steht.
 
 Außerdem können Queries konstruiert werden, die ein fachliches Problem zwar auf einfache Weise lösen, andererseits jedoch die Verwendung eines parametrisierten Prepared Statements unmöglich machen.
@@ -59,6 +59,7 @@ mssql_query($query);
 \end{margincap}
 \end{listing}
 
+\section{Alternativen}
 In all diesen Fällen muss die gefährdete Applikation also auf andere Art und Weise abgesichert werden. Ein gängiger Ansatz zur Realisierung einer solchen Schutzmaßnahme stellt eine vorgeschaltene Softwarekomponenta dar, welche auf Basis von Filterregeln einzelne Requests verwirft oder modifiziert. Hierzu soll zuerst ein übliches Schema einer Client"=Server"=Architektur skizziert werden.
 
 \begin{figure}[ht!]
@@ -85,11 +86,10 @@ In all diesen Fällen muss die gefährdete Applikation also auf andere Art und W
 
 %TODO Logging --> passives Verhalten, um noch nicht entdeckte Schwachstellen aufzudecken
 
-\mymarginnote{Ein Beispiel hierfür stellen etwa \emph{Load Balancer} zur Lastverteilung auf mehrere Server dar.}
+\mymarginnote[-2em]{Ein Beispiel hierfür stellen etwa \emph{Load Balancer} zur Lastverteilung auf mehrere Server dar.}
 In aktuellen Webserverarchitekturen können weitere Komponenten enthalten sein, die an dieser Stelle jedoch vernachlässigt und abstrahiert werden sollen.
 
-In dem abstrakten Schema eines Requests aus Abbildung \ref{img:server_arch} bieten sich zwei Stellen an, an welchen einzelne Parameter der Anfrage auf ihre Gefährlichkeit in Bezug auf SQL"=Injections hin untersucht werden können. Analysiert man die beispielsweise die GET und POST Parameter eines Requests noch bevor sie beim Webserver ankommt, spricht man von einer \emph{Web Application Firewall}. Alternativ können auch die Zugriffe auf den Datenbankserver selbst untersucht werden -- und zwar von einer vorgeschaltenen \emph{Datenbank"=Firewall.}
+In dem abstrakten Schema eines Requests aus Abbildung \ref{img:server_arch} bieten sich zwei Stellen an, an welchen einzelne Parameter der Anfrage auf ihre Gefährlichkeit in Bezug auf SQL"=Injections hin untersucht werden können. Analysiert man die beispielsweise die GET und POST Parameter eines Requests noch bevor sie beim Webserver ankommt, spricht man von einer \emph{Web Application Firewall}. Alternativ können auch die Zugriffe auf den Datenbankserver selbst untersucht werden -- und zwar von einer vorgeschaltenen \emph{Datenbank"=Firewall.}\mymarginnote[-4em]{Sowohl Web Application Firewall als auch Datenbank"=Firewall stellen \emph{Intrusion Detection} Systeme dar.}
 
-
-
+\chapter{Versuchsbeschreibung}
 \end{document}
