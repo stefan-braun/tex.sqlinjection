@@ -32,8 +32,8 @@ Derartige Angriffe basieren darauf, dass Benutzereingaben ungeprüft in Abfragen
 
 \section{Verhinderung von SQL"=Injections}
 
-\mymarginnote[0em]{\enquote{Don't trust user input.}}
-Es stellt sich folglich die Frage, wie derartige Angriffe verhindert werden können. Die übliche Vorgehensweise stellt hierbei die Überprüfung der vom Client übergebenen Parameter dar. Etwa könnte unter PHP ein Parameter, für den nur Ganzzahlen vorgesehen sind, per Konvertierung durch \mintinline{php}{intval()} abgesichert werden. \mymarginnote[-2em]{Diese PHP"=Funktion ersetzt beispielsweise ' durch \textbackslash'.  Dadurch wird es erschwert, das aktuelle String"=Literal im SQL"=Statement zu beenden und zusätzliche Befehle anzufügen.} Bei beliebigen Zeichenketten escaped die Funktion \mintinline{php}{mysql_real_escape_string()} bestimmte Zeichen, die einen Ausbruch aus der Abfrage erlauben können. Sicherer sind allerdings sogenannte \emph{Prepared Statements}, die die Anfrage und die zugehörigen Parameter getrennt voneinander übertragen und dadurch Injections verhindern.
+\mymarginnote[-2em]{\enquote{Don't trust user input.}}
+Es stellt sich folglich die Frage, wie derartige Angriffe verhindert werden können. Die übliche Vorgehensweise stellt hierbei die Überprüfung der vom Client übergebenen Parameter dar. Etwa könnte unter PHP ein Parameter, für den nur Ganzzahlen vorgesehen sind, per Konvertierung durch \mintinline{php}{intval()} abgesichert werden. \mymarginnote[-3em]{Diese PHP"=Funktion ersetzt beispielsweise ' durch \textbackslash'.  Dadurch wird es erschwert, das aktuelle String"=Literal im SQL"=Statement zu beenden und zusätzliche Befehle anzufügen.} Bei beliebigen Zeichenketten escaped die Funktion \mintinline{php}{mysql_real_escape_string()} bestimmte Zeichen, die einen Ausbruch aus der Abfrage erlauben können. Sicherer sind allerdings sogenannte \emph{Prepared Statements}, die die Anfrage und die zugehörigen Parameter getrennt voneinander übertragen und dadurch Injections verhindern.
 
 Wenn also die Verhinderung von SQL"=Injections eine triviale Angelegenheit ist, weshalb bestimmen auch heutzutage Nachrichten über aktuelle, derartige Angriffe die Fachpresse? Die Gründe hierfür sind vielfältig. Möglicherweise ist veraltete Software im Einsatz oder dem Entwickler mangelt es schlicht an Vorwissen im Bereich der IT"=Sicherheit.
 \mymarginnote[-3em]{Ein weiteres Beispiel könnte zugekaufte Fremdsoftware darstellen, die im eigenen Netzwerk betrieben wird.}
@@ -66,7 +66,7 @@ In all diesen Fällen muss die gefährdete Applikation also auf andere Art und W
 \begin{margincap}
 \centering
 \begin{tikzpicture}[every node/.style={ultra thick,draw=black!60, font=\large\sffamily\color{black!60},inner sep=8pt,text height=1.5ex,text depth=.25ex,node distance=1.2cm,}]
-\node(hacker) {Hacker};
+\node(hacker) {Client};
 \node[right = of hacker.east, minimum width = 3pt,fill=documentColor, minimum height=3cm](firewall)  {};
 \node[below =0.1cm of firewall.south,draw=none] {Firewall};
 
@@ -89,7 +89,31 @@ In all diesen Fällen muss die gefährdete Applikation also auf andere Art und W
 \mymarginnote[-2em]{Ein Beispiel hierfür stellen etwa \emph{Load Balancer} zur Lastverteilung auf mehrere Server dar.}
 In aktuellen Webserverarchitekturen können weitere Komponenten enthalten sein, die an dieser Stelle jedoch vernachlässigt und abstrahiert werden sollen.
 
-In dem abstrakten Schema eines Requests aus Abbildung \ref{img:server_arch} bieten sich zwei Stellen an, an welchen einzelne Parameter der Anfrage auf ihre Gefährlichkeit in Bezug auf SQL"=Injections hin untersucht werden können. Analysiert man die beispielsweise die GET und POST Parameter eines Requests noch bevor sie beim Webserver ankommt, spricht man von einer \emph{Web Application Firewall}. Alternativ können auch die Zugriffe auf den Datenbankserver selbst untersucht werden -- und zwar von einer vorgeschaltenen \emph{Datenbank"=Firewall.}\mymarginnote[-4em]{Sowohl Web Application Firewall als auch Datenbank"=Firewall stellen \emph{Intrusion Detection} Systeme dar.}
+In dem abstrakten Schema eines Requests aus Abbildung \ref{img:server_arch} bieten sich zwei Stellen an, an welchen einzelne Parameter der Anfrage auf ihre Gefährlichkeit in Bezug auf SQL"=Injections hin untersucht werden können. Analysiert man die beispielsweise die GET und POST Parameter eines Requests noch bevor sie beim Webserver ankommt, spricht man von einer \emph{Web Application Firewall}. Alternativ können auch die Zugriffe auf den Datenbankserver selbst untersucht werden -- und zwar von einer vorgeschaltenen \emph{Datenbank"=Firewall.}\mymarginnote[-4em]{Sowohl Web Application Firewall als auch Datenbank"=Firewall stellen \emph{Intrusion Detection} Systeme dar.} Es stellt sich die Frage, inwiefern die beiden Ansätze in Bezug auf ihre Effektivität miteinander vergleichbar sind -- und ob sie einen wirksamen Schutz vor SQL="Injections bieten können.
+
+
+\begin{figure}[ht!]
+\begin{margincap}
+\centering
+\begin{tikzpicture}[every node/.style={ultra thick,draw=black!60, font=\large\sffamily\color{black!60},inner sep=8pt,text height=1.5ex,text depth=.25ex,node distance=0.5cm,}]
+\node(hacker) {Hacker};
+\node[right = of hacker.east, minimum width = 3pt,fill=documentColor, minimum height=3cm](firewall)  {};
+\node[below =0.1cm of firewall.south,draw=none] {Firewall};
+
+
+\node[right = of firewall.east](server)  {Webserver};
+\node[right = of server.east,fill = documentColor,font=\large\sffamily\color{white}](waf)  {WAF};
+\node[right = of waf.east](app)  {Anwendung};
+\node[below = of app.south,fill = documentColor,font=\large\sffamily\color{white}](dbf)  {DB-Firewall};
+\node[below = of dbf.south](db)  {Datenbank};
+
+
+\draw[ultra thick,draw=black!60,] (hacker) -- (firewall) -- (server) -- (waf) -- (app) -- (dbf) -- (db);
+\end{tikzpicture}
+\caption{In die Abbildung \ref{img:server_arch} wurden an den entsprechenden Stellen Schutzmechanismen eingefügt. Möglichkeiten hierfür sind eine \emph{Web-Application Firewall} -- kurz WAF -- und eine \emph{Datenbank-Firewall}. Es stellt sich die Frage, wie effektiv die jeweiligen Maßnahmen SQL"=Injections mitigieren können.}
+\label{img:protected_server_arch}
+\end{margincap}
+\end{figure}
 
 \chapter{Versuchsbeschreibung}
 \end{document}

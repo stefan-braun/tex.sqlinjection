@@ -20,7 +20,7 @@
 \def\pgfsysdriver{pgfsys-pdftex.def} %for texlive 2016
 \usepackage{tikz}
 \usetikzlibrary{positioning}
-\usetikzlibrary{arrows}
+\usetikzlibrary{arrows,patterns}
 \usetikzlibrary{calc}
 \usetikzlibrary{shadows.blur}
 \usepackage{tikz-3dplot}
@@ -53,8 +53,8 @@
 \titlecontents{chapter}
   [0em]{\vspace*{2\baselineskip}}
   {\parbox{4.5em}{%
-    \hfill\Huge\sffamily\bfseries\color{documentColor}\thecontentspage}%
-   \vspace*{-2.3\baselineskip}\leftbar\MakeUppercase{\sffamily\color{black!60}\small\chaptername~\thecontentslabel}\\\sffamily}
+    \hfill\Huge\sffamily\bfseries\color{documentColor}\thecontentslabel}%
+   \vspace*{-2.3\baselineskip}\leftbar\MakeUppercase{\sffamily\color{black!60}\small Seite~\thecontentspage}\\\sffamily}
   {}{\endleftbar}
 \titlecontents{section}
   [8.4em]
