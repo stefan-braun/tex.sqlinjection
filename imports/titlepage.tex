@@ -1,0 +1,36 @@
+%!TEX root = ../document.tex
+
+% center geometry on maketitle
+\newgeometry{margin=1in,left=0.34\paperwidth}
+\renewcommand\BackgroundPic{%
+\put(310,-180){%
+\parbox[b][\paperheight]{\paperwidth}{%
+\vfill
+\includegraphics[width=0.3\paperwidth,height=\paperheight,%
+keepaspectratio]{imports/thi_logo.eps}
+\vfill
+}}}
+\AddToShipoutPicture*{\BackgroundPic}
+
+\begin{titlepage}
+	\begin{tikzpicture}[remember picture,overlay]
+		\fill[documentColor] ($(current page.south west)$) -- ($(current page.north west)$)  -- ($(current page.north west) + (0.33\paperwidth,0)$) -- ($(current page.south west) + (0.33\paperwidth,0)$)-- cycle ;
+		%\path($(current page.south west) + (0.34\paperwidth,0)$) -- ($(current page.north west) + (0.34\paperwidth,0)$) node [midway, above, sloped, color=white] (TextNode) {\sffamily\fontsize{70}{60}\selectfont \MakeUppercase{\textls*[50]{computerforensik}}};
+		\draw[color=black!40,line width=2mm]($(current page.south west) + (0.33\paperwidth,0)$) -- ($(current page.north west) + (0.33\paperwidth,0)$);
+	\end{tikzpicture}
+
+	\vspace{0.23\paperheight}
+	\parbox[t]{\textwidth}{
+		\sffamily\color{documentColor}\Huge{Netzwerkforensik: \\[0.2cm] Erkennung von SQL-Injections} \\[0.6cm]
+		\sffamily\color{black!50}\Large{Stefan Braun} \\[0.3cm]
+		\sffamily\color{black!50}\Large{11. Juni 2016} \\[0.3cm]
+	}
+\end{titlepage}
+
+\clearpage
+
+
+% tufte geomtery
+\newgeometry{left=24.8mm,top=27.4mm,headsep=2\baselineskip,textwidth=127mm,marginparsep=8mm,marginparwidth=48mm,textheight=43\baselineskip,headheight=\baselineskip}
+% marginnote requires to update the textwidth after newgeometry
+\edef\marginnotetextwidth{\the\textwidth}

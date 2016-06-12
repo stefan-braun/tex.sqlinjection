@@ -1,6 +1,8 @@
 %!TEX options = --shell-escape
 \input{imports/def}
 
+\colorlet{documentColor}{darkred}
+
 \begin{document}
 
 \tableofcontents
@@ -41,33 +43,23 @@ Ebenfalls vorstellbar ist Software, die nicht mehr geändert werden kann -- etwa
 
 Außerdem können Queries konstruiert werden, die ein fachliches Problem zwar auf einfache Weise lösen, andererseits jedoch die Verwendung eines parametrisierten Prepared Statements unmöglich machen.
 
-\begin{listing}[ht!]
+\begin{listing}
 \begin{margincap}
-\begin{minted}[startinline,obeytabs]{php}
-$query  = ""
-    ."SELECT                        "
-    ."    $choosenText AS myText,   "
-    ."    name                      "
-    ."FROM                          "
-    ."    report                    "
-    ."ORDER BY                      "
-    ."    name $sorting             ";
-mssql_query($query);
-\end{minted}
+\inputminted[startinline,obeytabs]{php}{imports/weak_features.php}
 \caption{In diesem PHP"=Code wird mit der Variable \mintinline{php}{choosenText} eine Spalte und mit \mintinline{php}{sorting} eine Sortierreihenfolge ausgewählt. In beiden Fällen können keine Parameter für Prepared Statements verwendet werden.}
 \label{lst:strange_query}
 \end{margincap}
 \end{listing}
 
 \section{Alternativen}
-In all diesen Fällen muss die gefährdete Applikation also auf andere Art und Weise abgesichert werden. Ein gängiger Ansatz zur Realisierung einer solchen Schutzmaßnahme stellt eine vorgeschaltene Softwarekomponenta dar, welche auf Basis von Filterregeln einzelne Requests verwirft oder modifiziert. Hierzu soll zuerst ein übliches Schema einer Client"=Server"=Architektur skizziert werden.
+In all diesen Fällen muss die gefährdete Applikation also auf andere Art und Weise abgesichert werden. Ein gängiger Ansatz zur Realisierung einer solchen Schutzmaßnahme stellt eine vorgeschaltete Softwarekomponente dar, welche auf Basis von Filterregeln einzelne Requests verwirft oder modifiziert. Hierzu soll zuerst ein übliches Schema einer Client"=Server"=Architektur skizziert werden.
 
-\begin{figure}[ht!]
+\begin{figure}
 \begin{margincap}
 \centering
 \begin{tikzpicture}[every node/.style={ultra thick,draw=black!60, font=\large\sffamily\color{black!60},inner sep=8pt,text height=1.5ex,text depth=.25ex,node distance=1.2cm,}]
 \node(hacker) {Client};
-\node[right = of hacker.east, minimum width = 3pt,fill=documentColor, minimum height=3cm](firewall)  {};
+\node[right = of hacker.east, minimum width = 3pt,fill=darkred, minimum height=3cm](firewall)  {};
 \node[below =0.1cm of firewall.south,draw=none] {Firewall};
 
 
@@ -89,15 +81,15 @@ In all diesen Fällen muss die gefährdete Applikation also auf andere Art und W
 \mymarginnote[-2em]{Ein Beispiel hierfür stellen etwa \emph{Load Balancer} zur Lastverteilung auf mehrere Server dar.}
 In aktuellen Webserverarchitekturen können weitere Komponenten enthalten sein, die an dieser Stelle jedoch vernachlässigt und abstrahiert werden sollen.
 
-In dem abstrakten Schema eines Requests aus Abbildung \ref{img:server_arch} bieten sich zwei Stellen an, an welchen einzelne Parameter der Anfrage auf ihre Gefährlichkeit in Bezug auf SQL"=Injections hin untersucht werden können. Analysiert man die beispielsweise die GET und POST Parameter eines Requests noch bevor sie beim Webserver ankommt, spricht man von einer \emph{Web Application Firewall}. Alternativ können auch die Zugriffe auf den Datenbankserver selbst untersucht werden -- und zwar von einer vorgeschaltenen \emph{Datenbank"=Firewall.}\mymarginnote[-4em]{Sowohl Web Application Firewall als auch Datenbank"=Firewall stellen \emph{Intrusion Detection} Systeme dar.} Es stellt sich die Frage, inwiefern die beiden Ansätze in Bezug auf ihre Effektivität miteinander vergleichbar sind -- und ob sie einen wirksamen Schutz vor SQL="Injections bieten können.
+In dem abstrakten Schema eines Requests aus Abbildung \ref{img:server_arch} bieten sich zwei Stellen an, an welchen einzelne Parameter der Anfrage auf ihre Gefährlichkeit in Bezug auf SQL"=Injections hin untersucht werden können. Analysiert man die beispielsweise die GET und POST Parameter eines Requests noch bevor sie beim Webserver ankommt, spricht man von einer \emph{Web Application Firewall}. Alternativ können auch die Zugriffe auf den Datenbankserver selbst untersucht werden -- und zwar von einer vorgeschalteten \emph{Datenbank"=Firewall.}\mymarginnote[-4em]{Sowohl Web Application Firewall als auch Datenbank"=Firewall stellen \emph{Intrusion Detection} Systeme dar.} Es stellt sich die Frage, inwiefern die beiden Ansätze in Bezug auf ihre Effektivität miteinander vergleichbar sind -- und ob sie einen wirksamen Schutz vor SQL"=Injections bieten können.
 
 
-\begin{figure}[ht!]
+\begin{figure}
 \begin{margincap}
 \centering
 \begin{tikzpicture}[every node/.style={ultra thick,draw=black!60, font=\large\sffamily\color{black!60},inner sep=8pt,text height=1.5ex,text depth=.25ex,node distance=0.5cm,}]
 \node(hacker) {Hacker};
-\node[right = of hacker.east, minimum width = 3pt,fill=documentColor, minimum height=3cm](firewall)  {};
+\node[right = of hacker.east, minimum width = 3pt,fill=darkred, minimum height=3cm](firewall)  {};
 \node[below =0.1cm of firewall.south,draw=none] {Firewall};
 
 
@@ -115,5 +107,92 @@ In dem abstrakten Schema eines Requests aus Abbildung \ref{img:server_arch} biet
 \end{margincap}
 \end{figure}
 
+\chapter{Arten von SQL-Injections}
+\lettrine[lines=2]{S}{}QL"=Injections lassen sich nach unterschiedlichen Kriterien klassifizieren. Dies geschieht in Hinblick auf die Art und Weise wie ein Angreifer die verwundbare SQL"=Anfrage entdeckt, wie er den Schadcode einfügt und schließlich Daten auslesen kann. In diesem Kapitel soll ein grober Überblick über verschiedene Ansätze von SQL"=Injections vermittelt werden.
+
+\section{Tautologie"=basierte Injection}
+
+Die einfachste Variante einer SQL"=Injection sorgt dafür, dass eine logische Überprüfung im \mintinline{sql}{WHERE}"=Teil der Abfrage immer zu \texttt{true} evaluiert und somit alle betroffenen Zeilen zurückgegeben werden. Das Paradebeispiel hierfür ist eine Abfrage zur Authentisierung eines Benutzers.
+
+
+\begin{listing}
+\begin{margincap}
+\inputminted[startinline,obeytabs]{php}{imports/login_1.php}
+\caption{Eine einfache Anmeldungslogik: Wird in der Datenbank ein Nutzer mit dem übergebenen Nutzernamen und Passwort gefunden, wird eine Sessionvariable gesetzt. }
+\label{lst:login_query}
+\end{margincap}
+\end{listing}
+
+Wenn ein Angreifer die Logindaten jeweils auf \mintinline{sql}{' OR '' = '} setzt, wird jeweils überprüft, ob ein Leerstring identisch zu einem Leerstring ist. Da dieser Vergleich immer \texttt{true} ergibt, werden alle in der Tabelle \texttt{users} enthaltenen Zeilen zurückgegeben. Der Benutzer wird eingeloggt.
+
+\section{UNION based Injection}
+
+Etwas komplexer als die im vorherigen Abschnitt vorgestellte Methode sind Anfragen, welche die Menge der zurückgegebenen Zeilen eines \mintinline{sql}{SELECT} Statements durch ein angefügtes \mintinline{sql}{UNION} erweitern. Wichtig ist hierbei, dass die Anzahl der Spalten der mit \mintinline{sql}{UNION} angefügten Query identisch mit der Spaltenanzahl der ursprünglichen  \mintinline{sql}{SELECT} Abfrage sein muss. Führt der restliche Teil der originalen Abfrage zu Problemen, kann er gegebenenfalls auskommentiert werden. Hierzu muss an das Ende des injizierten \mintinline{sql}{UNION} Teils per \mintinline{sql}{--} ein Kommentar eingeleitet werden.
+
+
+\section{Statement Injection}
+
+\emph{Statement Injection } funktioniert ähnlich wie die \mintinline{sql}{UNION} basierte Variante, jedoch wird hier eine komplette, zusätzliche SQL"=Abfrage eingefügt. Hierzu wird zuerst die aktuelle Anfrage valide vervollständigt und anschließend per Semikolon beendet. Nun kann ein eigenständiges SQL"=Statement angehängt werden -- beispielsweise \mintinline{sql}{DROP DATABASE wordpress;}. Folgender SQL"=Code kann wie im vorherigen Abschnitt erläutert einfach auskommentiert werden.
+\mymarginnote[-4em]{ {\color{documentColor}\bfseries Angemerkt \\ }In einem \texttt{xkcd} Webcomic unter \url{https://xkcd.com/327/} löscht eine Mutter Daten der Schule: Sie hatte ihren Sohn \enquote{\texttt{Robert'); DROP TABLE Students; --}} getauft -- Ein klassisches Beispiel für eine Statement Injection.}
+
+
+Damit derartige Angriffe unter PHP funktionieren, muss statt der Funktion \mintinline{php}{mysqli_query()} die Variante \mintinline{php}{mysqli_multi_query()} verwendet werden. Andernfalls ist die Verwendung konkatenierter SQL"=Statements nicht möglich.
+
+
+\section{Error based SQL Injection}
+
+Wenn eine Anfrage zwar anfällig für SQL"=Injections ist, die zugehörige Webseite allerdings keine Daten direkt ausgibt, können möglicherweise dennoch Daten ausgelesen werden. In manchen Webanwendungen wird bei einem Fehler in einer Datenbankabfrage die entsprechende Fehlermeldung ausgegeben. Kann diese Ausgabe durch die Injection provoziert und geändert werden, so ist eine \emph{Error based SQL Injection} möglich.
+
+
+\begin{listing}
+\begin{margincap}
+\inputminted[startinline,obeytabs]{php}{imports/cp_multi_error.php}
+\caption[cp multi view calendar]{Ein Auszug aus dem Wordpress"=Plugin \texttt{cp multi view calendar}\footnote{\url{https://github.com/wp-plugins/cp-multi-view-calendar}}. Die Variable \texttt{id} wird nicht überprüft und ermöglicht so SQL"=Injections. Im Fehlerfall wird die Meldung in Zeile 7 in eine lokale Variable geschrieben und später ausgegeben.}
+\label{lst:cp_multi_error}
+\end{margincap}
+\end{listing}
+
+Übergibt man als \texttt{id} etwa \mintinline{sql}{EXTRACTVALUE(0x0a,(SELECT USERNAME())}, so wird der Inhalt von Listing \ref{lst:error_based_output} ausgegeben. Die Funktion \mintinline{sql}{EXTRACTVALUE} erwartet als zweiten Parameter eine gültige XPath"=Anweisung. Der Benutzername, der per \mintinline{sql}{USERNAME()} in einer Subquery ausgelesen wird, ist kein gültiges Argument -- und wird daher in der Fehlermeldung mit ausgegeben.
+
+\begin{listing}
+\begin{margincap}
+\begin{minted}[obeytabs]{json}
+{
+    "IsSuccess":false,
+    "Msg":"XPATH syntax error: '@localhost'"
+}
+\end{minted}
+\caption{Ausgabe der \emph{Error based} SQL"=Injection. In der Fehlermeldung ist das Resultat der Subquery zu sehen, in diesem Fall der Rückgabewert der Funktion \mintinline{sql}{USERNAME().}}
+\label{lst:error_based_output}
+\end{margincap}
+\end{listing}
+
+
+\section{Time based SQL injection}
+
+Ändert sich an der Ausgabe der Seite trotz erfolgreich ausgeführter SQL"=Injection nichts, so ist es dennoch möglich, Daten auszulesen. Hierfür werden SQL Funktionen wie \mintinline{sql}{SLEEP()} oder \mintinline{sql}{BENCHMARK()} verwendet, die die Ausführungsdauer einer Query erhöhen können. Verbindet man dies mit einer \mintinline{sql}{IF()} Bedingung und misst die Dauer des gesamten Requests, so erlaubt dies erneut Rückschlüsse auf Datenbankinhalte.
+
+\begin{listing}
+\begin{margincap}
+\begin{minted}[obeytabs]{sql}
+(
+    SELECT
+        IF(
+            SUBSTRING(user.Password,1,1) = CHAR(12)
+            ,SLEEP(5)
+            ,2
+        )
+    FROM
+        mysql.user
+    LIMIT
+        1
+)
+\end{minted}
+\caption[timebased]{Diese Query vergleicht ein einzelnes Zeichen einer Zeichenkette mit einem bestimmten ASCII"=Code. Liefert der Vergleich \texttt{true}, so wird fünf Sekunden gewartet.}
+\label{lst:time_based}
+\end{margincap}
+\end{listing}
+
 \chapter{Versuchsbeschreibung}
+
 \end{document}
