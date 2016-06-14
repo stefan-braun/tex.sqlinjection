@@ -133,7 +133,7 @@ Etwas komplexer als die im vorherigen Abschnitt vorgestellte Methode sind Anfrag
 \section{Statement Injection}
 
 \emph{Statement Injection } funktioniert ähnlich wie die \mintinline{sql}{UNION} basierte Variante, jedoch wird hier eine komplette, zusätzliche SQL"=Abfrage eingefügt. Hierzu wird zuerst die aktuelle Anfrage valide vervollständigt und anschließend per Semikolon beendet. Nun kann ein eigenständiges SQL"=Statement angehängt werden -- beispielsweise \mintinline{sql}{DROP DATABASE wordpress;}. Folgender SQL"=Code kann wie im vorherigen Abschnitt erläutert einfach auskommentiert werden.
-\mymarginnote[-4em]{ {\color{documentColor}\bfseries Angemerkt \\ }In einem \texttt{xkcd} Webcomic unter \url{https://xkcd.com/327/} löscht eine Mutter Daten der Schule: Sie hatte ihren Sohn \enquote{\texttt{Robert'); DROP TABLE Students; --}} getauft -- Ein klassisches Beispiel für eine Statement Injection.}
+\mymarginnote[-4em]{ {\color{documentColor}\bfseries Angemerkt: }In einem \texttt{xkcd} Webcomic unter \url{https://xkcd.com/327/} löscht eine Mutter Daten der Schule: Sie hatte ihren Sohn \enquote{\texttt{Robert'); DROP TABLE Students; --}} getauft -- Ein klassisches Beispiel für eine Statement Injection.}
 
 
 Damit derartige Angriffe unter PHP funktionieren, muss statt der Funktion \mintinline{php}{mysqli_query()} die Variante \mintinline{php}{mysqli_multi_query()} verwendet werden. Andernfalls ist die Verwendung konkatenierter SQL"=Statements nicht möglich.
