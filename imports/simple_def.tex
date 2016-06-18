@@ -1,0 +1,208 @@
+%!TEX root = ../document.tex
+\documentclass[oneside,11pt,DIV=8,headings=openright]{scrreprt}
+\usepackage{scrhack}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+%\usepackage[default]{droidserif}
+%\usepackage{FiraSans}
+\usepackage{setspace}
+\usepackage{microtype}
+\usepackage[T1]{fontenc}
+\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+\usepackage{blindtext}
+\usepackage{amsmath}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%tikz
+\def\pgfsysdriver{pgfsys-pdftex.def} %for texlive 2016
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\usetikzlibrary{arrows,patterns}
+\usetikzlibrary{calc}
+\usetikzlibrary{shadows.blur}
+\usepackage{tikz-3dplot}
+\definecolor{Gray}{HTML}{444444}
+\definecolor{myGray}{HTML}{23373b}
+\usetikzlibrary{arrows.meta}
+
+\usetikzlibrary{
+    shapes,
+    shapes.symbols}
+
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\pgfplotsset{compat=newest}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Big letters at the beginning of a chapter
+\usepackage{lettrine}
+\renewcommand{\LettrineFontHook}{\titlefont\color{black}\rmfamily}
+\renewcommand{\lettrine}[2][1]{#1}
+
+\setlength{\DefaultNindent}{0pt}
+\setlength{\DefaultFindent}{4pt}
+%\renewcommand{\LettrineFontHook}{\fontfamily{bch}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%minted
+\usepackage[newfloat]{minted}
+\usemintedstyle{manni}
+\setminted{tabsize=4}
+\setminted{obeytabs}
+\setminted{linenos}
+\setminted{bgcolor=listingbackground}
+\setmintedinline{breaklines}
+\setmintedinline{bgcolor={}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Tables
+\definecolor{lightGray}{RGB}{150, 150, 150}
+\usepackage{array}
+\usepackage{tabu}
+\usepackage{longtable}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% colors
+\definecolor{tableHeader}{RGB}{211, 47, 0}
+\definecolor{listingbackground}{HTML}{F4F4F4}
+\definecolor{tableLineOne}{RGB}{245, 245, 245}
+\definecolor{tableLineTwo}{RGB}{224, 224, 224}
+\definecolor{THI-Blue}{RGB}{1,90,156}
+\definecolor{darkred}{rgb}{0.70, 0.0, 0.0}
+\colorlet{BLACK}{black}
+\colorlet{documentColor}{cyan}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Titel
+\title{Netzwerkforensik: Erkennung von SQL-Injections}
+%\publishers{TH Ingolstadt}
+\subtitle{Computerforensik}
+\author{Stefan Braun}
+\date{23. Mai 2016}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Section font settings
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\usepackage{url}
+\makeatletter
+\g@addto@macro{\UrlBreaks}{\UrlOrds}
+\makeatother
+%csquotes after minted
+\usepackage{csquotes}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% caption
+\usepackage[labelsep=colon]{caption}
+% \DeclareCaptionLabelSeparator{newlinesep}{ \\ }
+% \captionsetup{
+%   labelsep=newlinesep
+% }
+\usepackage{mcaption}
+\usepackage{float}
+\usepackage{ragged2e}
+\renewenvironment{margincap}{}{}
+% \renewcommand{\thetable}{\alph{table}}
+% \renewcommand{\thefigure}{\alph{figure}}
+% \DeclareCaptionLabelFormat{nonamecap}{\MakeUppercase{#2}}
+% \captionsetup{labelformat=nonamecap}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% marginnotes
+\usepackage{marginnote}
+% \renewcommand{\raggedleftmarginnote}{\justified}
+% \renewcommand{\raggedrightmarginnote}{\justified}
+\newcommand\mymarginnote[2][0pt]{
+
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Logo in title
+\usepackage{eso-pic}
+\newcommand\BackgroundPic{%
+\put(0,-180){%
+\parbox[b][\paperheight]{\paperwidth}{%
+\vfill
+\centering
+\includegraphics[width=0.3\paperwidth,height=\paperheight,%
+keepaspectratio]{imports/thi_logo.eps}
+\vfill
+}}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\setlength{\emergencystretch}{0.5em}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% section numbers in margin
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Header
+
+% \ohead{\headmark~~~{\color{documentColor}\rule[-0.2em]{1.5pt}{1.2em}}~~~\pagemark\hspace*{-4.5cm}}
+
+
+% \ohead{{\headmark~~~\color{documentColor}{\rule[-4pt]{\ruleWidth}{\voffset+\topmargin+\headheight+1in}}}\makebox[\pageNumperSpace][c]{\oldstylenums\pagemark}\hspace{\pageNumberHeaderSkip}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% begin of the document
+\AtBeginDocument{
+%settings for flat tables
+
+% colors
+
+%title page
+\renewcommand\BackgroundPic{%
+\put(220,-180){%
+\parbox[b][\paperheight]{\paperwidth}{%
+\vfill
+\includegraphics[width=0.3\paperwidth,%
+keepaspectratio]{imports/thi_logo.eps}
+\vfill
+}}}
+\AddToShipoutPicture*{
+% \begin{tikzpicture}[remember picture,overlay]
+%     \fill[documentColor!20] ($(current page.north) + (-8,0)$) -- ($(current page.45) + (0,1.3)$) -- ($(current page.45) + (0,4)$) -- cycle ;
+%     \fill[documentColor!50] ($(current page.north) + (-5,0)$) -- ($(current page.45) + (0,1.1)$) -- ($(current page.45) + (0,4)$) -- cycle ;
+%     \fill[documentColor] (current page.north) -- ($(current page.45) + (0,0.8)$) -- ($(current page.45) + (0,4)$) -- cycle ;
+% \end{tikzpicture}
+\BackgroundPic
+
+}
+
+
+\maketitle
+
+\clearpage
+
+
+% tufte geomtery
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+

@@ -195,4 +195,92 @@ Wenn eine Anfrage zwar anfällig für SQL"=Injections ist, die zugehörige Webse
 
 \chapter{Versuchsbeschreibung}
 
+Folgende Abschnitte sollen aufzeigen, wie im Zuge dieser Seminararbeit die Tauglichkeit verschiedener automatisierter Angriffs- und Verteidigungsmechanismen rund um SQL-Injections getestet wurde.
+
+\section{Grundlegende Überlegungen}
+
+Wenn die Bewertung einer derartigen Abwehrmaßnahme zum Thema wird, kommen zwei einfache Metriken in Frage: die Anzahl der \emph{false positives} und die der \emph{true negatives}. Wie viele HTTP"=Anfragen führen zwar zu SQL"=Injections, werden jedoch nicht erkannt -- und auf der anderen Seite: Wie viele Anfragen werden verworfen, obwohl sie eigentlich ungefährlich sind?
+
+Je eines der Beiden zu 100\% zu erfüllen ist einfach: \emph{false positives} werden verhindert, indem die Firewall alle Anfragen blockiert, \emph{true negatives} treten nicht auf, wenn keine einzige Überprüfung stattfindet oder die Abwehrmaßnahme komplett deaktiviert wird. Da beide Extreme üblicherweise unerwünscht sind, gilt es ein passendes Mittelmaß zu finden.
+
+\mymarginnote{Um ein Beispiel zu geben: Einem harmlosen Benutzer, der sich \texttt{"DROP DATABASE"} nennen möchte, eine Fehlermeldung zu präsentieren, ist der Wirtschaftlichkeit der Website meist weniger abträglich als das Löschen der kompletten Datenbank.}Es sei zudem darauf hingewiesen, dass die Nichterkennung einer SQL"=Injection größeren Schaden verursachen kann als das versehentliche Verwerfen einer normalen Anfrage.
+
+\section{Verwendete Werkzeuge}
+
+Bezugnehmend auf die Abbildung \ref{img:protected_server_arch} wird jeweils eine Web Application Firewall und eine Database Firewall getestet. Damit diese Tests möglich sind, muss zum einen die grundlegende Infrastruktur aufgebaut werden: Die Basis bildet ein Apache 2.4 Webserver auf einem Linux"=Serversystem.\mymarginnote{Zum Einsatz kommt ein 64"=bit Ubuntu Server. Siehe auch {\url{http://www.ubuntu.com/download/server}}} Damit Angriffe möglich sind, muss eine für SQL"=Injections verwundbare Applikation eingerichtet werden. Mögliche Schwachstellen werden schließlich automatisiert mit dem Tool \emph{sqlmap} gesucht und getestet.
+
+\section{Versuchsablauf}
+
+Schwachstellen, die mit sqlmap entdeckt wurden, werden als \texttt{Request} Objekte in einem Pythonskript zusammengefasst. Anschließend wird je eine der beiden Abwehrmaßnahmen aktiviert. Das Pythonskript führt die Requests der Reihe nach aus und überprüft ob die SQL"=Injection erfolgreich abgefangen wurde. Abschließend wird eine Statistik der erfolgreichen und der abgewehrten SQL"=Injections ausgegeben.
+
+
+\section{Automatisierung der SQL-Injections mit sqlmap}
+
+Zum Auffinden verwundbarer Request"=Parameter wurde das Python basierte Werkzeug \emph{sqlmap} ausgewählt. Es bietet verschiedene Kommandozeilenoptionen an, deren Verwendung an dieser Stelle kurz erläutert wird.\mymarginnote{Vergleiche hierzu \url{https://github.com/sqlmapproject/sqlmap/wiki/Usage}} Das frei verfügbare Tool kann von \url{http://sqlmap.org/} aus installiert werden.
+
+\begin{listing}
+\begin{minted}{bash}
+> python sqlmap.py -u "http://www.example.com/app.php?id=1"
+\end{minted}
+\end{listing}
+
+Mit dem Parameter \texttt{-u} wird die anzugreifende URL angegeben. Bereits dieses Argument genügt für eine erste Analyse: Standardmäßig wird ein \texttt{GET}"=Request verwendet und dabei versucht, alle in der URL enthaltenen Parameter anzugreifen. Hierbei setzt sqlmap verschiedene mögliche Payloads für die angegeben Parameter ein und überprüft anhand der Serverantwort, ob die SQL"=Injection erfolgreich war.
+
+\begin{listing}
+\begin{minted}[breaklines]{bash}
+> python sqlmap.py -u "http://www.example.com/app.php" --data={username=&password=}
+\end{minted}
+\end{listing}
+
+sqlmap ist ebenfalls in der Lage, \texttt{POST}"=Requests durchzuführen. Hierzu werden die Parameter mit dem Argument \texttt{--data} angegeben.
+
+
+\begin{listing}
+\begin{minted}[breaklines]{text}
+sqlmap identified the following injection point(s) with a total of 307 HTTP(s) requests:
+---
+Parameter: username (POST)
+    Type: boolean-based blind
+    Title: OR boolean-based blind - WHERE or HAVING clause (MySQL comment) (NOT)
+    Payload: uname=") OR NOT 7407=7407#&passwd=
+
+    Type: AND/OR time-based blind
+    Title: MySQL >= 5.0.12 OR time-based blind (comment)
+    Payload: uname=") OR SLEEP(5)#&passwd=
+\end{minted}
+\end{listing}
+
+Findet sqlmap verwundbare Parameter, so werden diese zusammen mit dem genutzten Payload ausgegeben. Im obigen Beispiel war der Parameter \texttt{username} angreifbar, sqlmap liefert hierzu eine time-based und eine boolean-based SQL"=Injection.
+
+\begin{listing}
+\begin{minted}[breaklines]{bash}
+> python sqlmap.py --level=5 -u "http://www.example.com/app.php" --data={username=&password=}
+\end{minted}
+\end{listing}
+
+Gelingt es sqlmap nicht, eine SQL"=Injection zu finden, so kann mit \texttt{--level} die Anzahl der getesteten SQL"=Injection"=Varianten erhöhen -- wobei 1 die niedrigste Stufe und 5 jene Stufe mit der größten Zahl an Anfragen darstellt. Neben der Anzahl der möglichen Varianten pro Parameter werden mit höheren Stufen auch Cookies und HTTP"=Header getestet. Die größere Anzahl an Anfragen hat allerdings auch eine längere Ausführungsdauer des Befehls zur Folge.
+
+\begin{listing}
+\begin{minted}[breaklines]{bash}
+> python sqlmap.py  -o --dbms=MySQL -u "http://www.example.com/app.php?id"
+\end{minted}
+\end{listing}
+
+Gerade hierfür kann die Verwendung der Argumente \texttt{-o} und \texttt{--dbms} sinnvoll sein. Mit \texttt{-o} werden allgemeine optimierende Optionen aktiviert -- etwa Multithreading -- welche die Ausführungsdauer reduzieren können. Ist das verwendete Datenbankmanagementsystem bekannt, so kann auch mit der Angabe von \texttt{--dbms} verhindert werden, dass SQL"=Injections, die für andere DBMS spezifischen Code enthalten, durchgeführt wird.
+
+
+\section{Verwundbare Beispielapplikation}
+
+\section{Apache und ModSecurity}
+
+\section{MySQL Enterprise: Datenbank und Firewall}
+
+
+\chapter{Ergebnisse}
+
+90 von 90,
+
+keine 100% bei ModSecurity "1' or' "
+
+
 \end{document}
