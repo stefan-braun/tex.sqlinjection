@@ -6,6 +6,7 @@
 \begin{document}
 
 \tableofcontents
+
 \chapter{SQL-Injections im Jahr 2016}
 
 \mymarginnote[-2em]{Derzeit werden Daten für die kommende OWASP Top Ten 2016 gesammelt.}
@@ -17,7 +18,7 @@
 \label{tab:owasp_top_ten}
 \centering
 \begin{tabu} to \textwidth {l l X<{\strut} l}
-	\rowfont{\sffamily\bfseries\leavevmode\color{white}}
+	\rowfont{\sffamily\bfseries\leavevmode\color{tableHeaderText}}
 	\rowcolor{tableHeader}
 	& & Kategorie & \\
 	\rowfont{\sffamily}
@@ -35,13 +36,9 @@ Derartige Angriffe basieren darauf, dass Benutzereingaben ungeprüft in Abfragen
 \section{Verhinderung von SQL"=Injections}
 
 \mymarginnote[-2em]{\enquote{Don't trust user input.}}
-Es stellt sich folglich die Frage, wie derartige Angriffe verhindert werden können. Die übliche Vorgehensweise stellt hierbei die Überprüfung der vom Client übergebenen Parameter dar. Etwa könnte unter PHP ein Parameter, für den nur Ganzzahlen vorgesehen sind, per Konvertierung durch \mintinline{php}{intval()} abgesichert werden. \mymarginnote[-3em]{Diese PHP"=Funktion ersetzt beispielsweise ' durch \textbackslash'.  Dadurch wird es erschwert, das aktuelle String"=Literal im SQL"=Statement zu beenden und zusätzliche Befehle anzufügen.} Bei beliebigen Zeichenketten escaped die Funktion \mintinline{php}{mysql_real_escape_string()} bestimmte Zeichen, die einen Ausbruch aus der Abfrage erlauben können. Sicherer sind allerdings sogenannte \emph{Prepared Statements}, die die Anfrage und die zugehörigen Parameter getrennt voneinander übertragen und dadurch Injections verhindern.
+Es stellt sich folglich die Frage, wie derartige Angriffe verhindert werden können. Die übliche Vorgehensweise stellt hierbei die Überprüfung der vom Client übergebenen Parameter dar. Etwa könnte unter PHP ein Parameter, für den nur Ganzzahlen vorgesehen sind, per Konvertierung durch \mintinline{php}{intval()} abgesichert werden.\mymarginnote[-3em]{Diese PHP"=Funktion ersetzt beispielsweise ' durch \textbackslash'.  Dadurch wird es erschwert, das aktuelle String"=Literal im SQL"=Statement zu beenden und zusätzliche Befehle anzufügen.} Bei beliebigen Zeichenketten escaped die Funktion \mintinline{php}{mysql_real_escape_string()} bestimmte Zeichen, die einen Ausbruch aus der Abfrage erlauben können. Sicherer sind allerdings sogenannte \emph{Prepared Statements}, die die Anfrage und die zugehörigen Parameter getrennt voneinander übertragen und dadurch Injections verhindern.
 
-Wenn also die Verhinderung von SQL"=Injections eine triviale Angelegenheit ist, weshalb bestimmen auch heutzutage Nachrichten über aktuelle, derartige Angriffe die Fachpresse? Die Gründe hierfür sind vielfältig. Möglicherweise ist veraltete Software im Einsatz oder dem Entwickler mangelt es schlicht an Vorwissen im Bereich der IT"=Sicherheit.
-\mymarginnote[-3em]{Ein weiteres Beispiel könnte zugekaufte Fremdsoftware darstellen, die im eigenen Netzwerk betrieben wird.}
-Ebenfalls vorstellbar ist Software, die nicht mehr geändert werden kann -- etwa weil der Aufwand zu groß wäre, keine Entwickler vorhanden sind, oder aber der zugehörige Sourcecode nicht zur Verfügung steht.
-
-Außerdem können Queries konstruiert werden, die ein fachliches Problem zwar auf einfache Weise lösen, andererseits jedoch die Verwendung eines parametrisierten Prepared Statements unmöglich machen.
+Wenn also die Verhinderung von SQL"=Injections eine triviale Angelegenheit ist, weshalb bestimmen auch heutzutage Nachrichten über aktuelle, derartige Angriffe die Fachpresse? Die Gründe hierfür sind vielfältig. Möglicherweise ist veraltete Software im Einsatz oder dem Entwickler mangelt es schlicht an Vorwissen im Bereich der IT"=Sicherheit. \mymarginnote[-3em]{Ein weiteres Beispiel könnte zugekaufte Fremdsoftware darstellen, die im eigenen Netzwerk betrieben wird.} Ebenfalls vorstellbar ist Software, die nicht mehr geändert werden kann -- etwa weil der Aufwand zu groß wäre, keine Entwickler vorhanden sind, oder aber der zugehörige Sourcecode nicht zur Verfügung steht. Außerdem können Queries konstruiert werden, die ein fachliches Problem zwar auf einfache Weise lösen, andererseits jedoch die Verwendung eines parametrisierten Prepared Statements unmöglich machen.
 
 \begin{listing}
 \begin{margincap}
@@ -132,7 +129,7 @@ Etwas komplexer als die im vorherigen Abschnitt vorgestellte Methode sind Anfrag
 
 \section{Statement Injection}
 
-\emph{Statement Injection } funktioniert ähnlich wie die \mintinline{sql}{UNION} basierte Variante, jedoch wird hier eine komplette, zusätzliche SQL"=Abfrage eingefügt. Hierzu wird zuerst die aktuelle Anfrage valide vervollständigt und anschließend per Semikolon beendet. Nun kann ein eigenständiges SQL"=Statement angehängt werden -- beispielsweise \mintinline{sql}{DROP DATABASE wordpress;}. Folgender SQL"=Code kann wie im vorherigen Abschnitt erläutert einfach auskommentiert werden.
+{Statement Injection } funktioniert ähnlich wie die \mintinline{sql}{UNION} basierte Variante, jedoch wird hier eine komplette, zusätzliche SQL"=Abfrage eingefügt. Hierzu wird zuerst die aktuelle Anfrage valide vervollständigt und anschließend per Semikolon beendet. Nun kann ein eigenständiges SQL"=Statement angehängt werden -- beispielsweise \mintinline{sql}{DROP DATABASE wordpress;}. Folgender SQL"=Code kann wie im vorherigen Abschnitt erläutert einfach auskommentiert werden.
 \mymarginnote[-4em]{ {\color{documentColor}\bfseries Angemerkt: }In einem \texttt{xkcd} Webcomic unter \url{https://xkcd.com/327/} löscht eine Mutter Daten der Schule: Sie hatte ihren Sohn \enquote{\texttt{Robert'); DROP TABLE Students; --}} getauft -- Ein klassisches Beispiel für eine Statement Injection.}
 
 
@@ -172,7 +169,7 @@ Wenn eine Anfrage zwar anfällig für SQL"=Injections ist, die zugehörige Webse
 
 Ändert sich an der Ausgabe der Seite trotz erfolgreich ausgeführter SQL"=Injection nichts, so ist es dennoch möglich, Daten auszulesen. Hierfür werden SQL Funktionen wie \mintinline{sql}{SLEEP()} oder \mintinline{sql}{BENCHMARK()} verwendet, die die Ausführungsdauer einer Query erhöhen können. Verbindet man dies mit einer \mintinline{sql}{IF()} Bedingung und misst die Dauer des gesamten Requests, so erlaubt dies erneut Rückschlüsse auf Datenbankinhalte.
 
-\begin{listing}
+\begin{listing}[ht!]
 \begin{margincap}
 \begin{minted}[obeytabs]{sql}
 (
@@ -252,7 +249,7 @@ Parameter: username (POST)
 
 Findet sqlmap verwundbare Parameter, so werden diese zusammen mit dem genutzten Payload ausgegeben. Im obigen Beispiel war der Parameter \texttt{username} angreifbar, sqlmap liefert hierzu eine time-based und eine boolean-based SQL"=Injection.
 
-\begin{listing}
+\begin{listing}[ht!]
 \begin{minted}[breaklines]{bash}
 > python sqlmap.py --level=5 -u "http://www.example.com/app.php" --data={username=&password=}
 \end{minted}
@@ -260,20 +257,79 @@ Findet sqlmap verwundbare Parameter, so werden diese zusammen mit dem genutzten 
 
 Gelingt es sqlmap nicht, eine SQL"=Injection zu finden, so kann mit \texttt{--level} die Anzahl der getesteten SQL"=Injection"=Varianten erhöhen -- wobei 1 die niedrigste Stufe und 5 jene Stufe mit der größten Zahl an Anfragen darstellt. Neben der Anzahl der möglichen Varianten pro Parameter werden mit höheren Stufen auch Cookies und HTTP"=Header getestet. Die größere Anzahl an Anfragen hat allerdings auch eine längere Ausführungsdauer des Befehls zur Folge.
 
-\begin{listing}
+\begin{listing}[ht!]
 \begin{minted}[breaklines]{bash}
 > python sqlmap.py  -o --dbms=MySQL -u "http://www.example.com/app.php?id"
 \end{minted}
 \end{listing}
 
-Gerade hierfür kann die Verwendung der Argumente \texttt{-o} und \texttt{--dbms} sinnvoll sein. Mit \texttt{-o} werden allgemeine optimierende Optionen aktiviert -- etwa Multithreading -- welche die Ausführungsdauer reduzieren können. Ist das verwendete Datenbankmanagementsystem bekannt, so kann auch mit der Angabe von \texttt{--dbms} verhindert werden, dass SQL"=Injections, die für andere DBMS spezifischen Code enthalten, durchgeführt wird.
+Gerade hierfür kann die Verwendung der Argumente \texttt{-o} und \texttt{--dbms} sinnvoll sein. Mit \texttt{-o} werden allgemeine optimierende Optionen aktiviert -- etwa Multithreading -- welche die Ausführungsdauer reduzieren können. Ist das verwendete Datenbankmanagementsystem bekannt, so kann auch mit der Angabe von \texttt{--dbms} verhindert werden, dass SQL"=Injections, die für andere DBMS spezifischen Code enthalten, durchgeführt wird.\mymarginnote{Alternativ kann auch mit \texttt{--threads} die Anzahl der zu verwendenden Threads explizit angegeben werden. Der Parameter \texttt{-o} setzt standardmäßig drei Threads ein.}
 
 
 \section{Verwundbare Beispielapplikation}
 
+Um die Möglichkeiten sowohl von sqlmap als auch der Firewall"=Anwendungen auszuloten zu können, wird eine verwundbare Beispielapplikation benötigt. Verwendet wird an dieser Stelle \emph{SQLI-labs}\mymarginnote{Vergleiche \url{https://github.com/Audi-1/sqli-labs}}. Diese beinhaltet 53 einfache Formulare auf Basis von PHP 5 und ist als Lernplattform für SQL"=Injections gedacht. Die einzelnen Formulare greifen auf GET"=Parameter wie \texttt{id} oder \texttt{sort} zu, auch Loginfelder mit Benutzername und Passwort sind gegeben.
+
+Von diesen 53 Tests konnte sqlmap bei 32 mögliche SQL"=Injections finden, jeweils zwischen einer und vier verschiedenen. Diese summieren sich zu 90 verschiedenen GET"= und POST"=Anfragen auf, die die Grundlage für den Versuch darstellen. Die gefundenen SQL"=Injections lassen sich verschiedenen Kategorien zu ordnen, unter anderem Time-based und Error-based Injections waren vertreten.
+
 \section{Apache und ModSecurity}
 
+Die eingesetzte WAF"=Lösung \emph{ModSecurity} ist ein Webserverplugin, welches für nginx, IIS und Apache verfügbar ist. Es basiert darauf, eingehende Serveranfragen anhand von Filterregeln auf potentielle Angriffe hin zu untersuchen. Matchen eine oder mehrere dieser Regeln, so kann die Anfrage abgelehnt oder geloggt werden\mymarginnote{Entsprechend ist die Verhaltensweise ein \emph{Intrusion Detection System} oder ein \emph{Intrusion Prevention System}.}.
+
+Die Filterregeln sind nicht Bestandteil von ModSecurity und müssen zusätzlich installiert und aktiviert werden. Neben dem kostenpflichtigen Angebot der Firma Trustwave -- des Herstellers von ModSecurity -- können auch frei verfügbare Regelsätze des OWASP verwendet werden.\mymarginnote{Die Regelsätze von Trustwave können für jährliche 495 Dollar lizenziert werden und beinhalten die OWASP Regeln. OWASP stellt seine Regeln unter \url{https://github.com/SpiderLabs/owasp-modsecurity-crs} zur Verfügung.} Neben der Filterung von SQL"=Injections werden auch XSS"=Attacken und Schwachstellenscanner abgewehrt.
+
+
+
 \section{MySQL Enterprise: Datenbank und Firewall}
+
+Als Datenbanksystem wird MySQL eingesetzt. In der kostenpflichtigen Enterprise"=Variante bietet dieses DBMS zusätzlich eine Datenbankfirewall an. Wie diese Firewallmechanik funktioniert, wird im Ablaufdiagramm in Abbildung \ref{img:db_firewall} dargestellt.
+
+\begin{figure}[ht]
+\begin{margincap}
+\centering
+\begin{tikzpicture}[node distance = 1.5cm, every node/.style={draw=white, align=center, text centered, draw=white, font=\footnotesize\sffamily,fill=documentColor!80, text=white,inner sep=5pt,minimum width=3cm}]
+    \tikzstyle{startstop} = [rectangle, rounded corners, minimum height=1cm, draw=white]
+    \tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum height=1cm,  draw=white]
+    \tikzstyle{process} = [rectangle, minimum height=1cm,  draw=white]
+    \tikzstyle{decision} = [diamond, minimum height=1cm,  draw=white,  aspect=3]
+    \tikzstyle{arrow} = [thick,->,>=stealth]
+    \tikzstyle{desc} = [text=black,midway,fill=none,draw=none]
+
+    \node (start) [startstop] {Receive SQL \\ from Client};
+    \node (in1) [process, right of=start, xshift=2cm] {Digest into \\ parser tokens};
+    \node (fw) [process, right of=in1, xshift=2cm] {Firewall};
+
+    \node (check) [decision, below of=fw, yshift=-0.5cm] {Check user \\Firewall mode};
+    \node (store) [process, left of=check, xshift=-3cm] {Store SQL \\ in whitelist};
+
+    \node (white) [decision, below of=check, yshift=-0.5cm] {In whitelist? \\};
+    \node (log) [process, below of=white, yshift=-0.5cm] {Log Firewall Alert};
+    \node (decide) [decision, below of=log, yshift=-0.5cm] {Detect or \\ protect mode?};
+
+    \node (reject) [startstop,below of=decide, yshift=-0.5cm] {Reject SQL};
+    \node (exec) [startstop,left of=reject, xshift=-3cm] {Execute SQL};
+
+    \draw [arrow] (start) -- (in1);
+    \draw [arrow] (in1) -- (fw);
+    \draw [arrow] (fw) -- (check);
+    \draw [arrow] (check) -- (store) node[desc,xshift=0.7cm,yshift=0.6cm]{Recording};
+    \draw [arrow] (check) -- (white) node[desc,xshift=1.5cm,yshift=0cm]{Protect / Detect};
+    \draw [arrow] (white) -- (log) node[desc,xshift=0.4cm,yshift=0cm]{No};
+    \draw [arrow] (log) -- (decide);
+    \draw [arrow] (decide) -- (reject) node[desc,xshift=0.7cm,yshift=0cm]{Protect};
+    \draw [arrow] (decide) -| (exec) node[desc,near start,xshift=0.7cm,yshift=0.4cm]{Detect};
+    \draw [arrow] (store) -- (exec);
+    \draw [arrow] (white) -| (exec) node[desc,near start,xshift=0.7cm,yshift=0.4cm]{Yes};
+    \draw [arrow] (check.east) -- ([xshift=0.5cm]check.east)   node[desc,xshift=0cm,yshift=0.5cm]{Off}|- ([yshift=-0.5cm]exec.south) -- (exec.south);
+
+\end{tikzpicture}
+
+\caption[db firewall]{Diese Grafik skizziert die Funktionsweise der MySQL Datenbankfirewall.\footnote{nach \url{http://dev.mysql.com/doc/refman/5.6/en/firewall.html}} Eingehende SQL"=Anfragen werden geparst und in Tokens zerlegt. Pro Datenbankbenutzer existiert nun eine Whitelist mit zulässigen Abfragen: Ist der Lernmodus aktiv, so werden alle neuen Anfragen in die Whitelist mit aufgenommen. Wird die Firewall aktiviert, so werden neue Anfragen je nach Einstellung nur geloggt oder auch abgelehnt. Entsprechend kann die Datenbankfirewall wieder als IDS oder IDP konfiguriert werden. }
+\label{img:db_firewall}
+\end{margincap}
+\end{figure}
+
+
 
 
 \chapter{Ergebnisse}

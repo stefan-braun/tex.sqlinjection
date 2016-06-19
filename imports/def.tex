@@ -3,13 +3,13 @@
 \usepackage{scrhack}
 \usepackage[utf8]{inputenc}
 \usepackage[ngerman]{babel}
-\usepackage{roboto}
+\usepackage{cabin}
 \usepackage{XCharter}
 %\usepackage[default]{droidserif}
 %\usepackage{FiraSans}
 \usepackage{inconsolata}
 \usepackage{setspace}
-\usepackage{microtype}
+\usepackage[activate={true,nocompatibility},letterspace=60]{microtype}
 \usepackage[T1]{fontenc}
 \usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
 \usepackage[letterpaper,left=1in,top=1in,headsep=2\baselineskip,textwidth=26pc,marginparsep=2pc,marginparwidth=12pc,textheight=44\baselineskip,headheight=\baselineskip]{geometry}
@@ -22,6 +22,7 @@
 \usepackage{tikz}
 \usetikzlibrary{positioning}
 \usetikzlibrary{arrows,patterns}
+\usetikzlibrary{shapes.geometric, arrows}
 \usetikzlibrary{calc}
 \usetikzlibrary{shadows.blur}
 \usepackage{tikz-3dplot}
@@ -73,6 +74,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % colors
+\definecolor{tableHeaderText}{RGB}{255,255, 255}
 \definecolor{tableHeader}{RGB}{211, 47, 0}
 \definecolor{listingbackground}{HTML}{F4F4F4}
 \definecolor{tableLineOne}{RGB}{245, 245, 245}
@@ -96,14 +98,14 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Section font settings
-\addtokomafont{chapter}{\normalfont\sffamily\Huge\leavevmode\color{documentColor}}
+\addtokomafont{chapter}{\normalfont\sffamily\Huge\leavevmode\color{documentColor}\lsstyle}
 \addtokomafont{section}{\normalfont\sffamily\leavevmode\color{documentColor}}
 \addtokomafont{subsection}{\normalfont\sffamily\leavevmode\color{documentColor}}
 \addtokomafont{subsubsection}{\normalfont\sffamily\leavevmode\color{documentColor}}
 \addtokomafont{paragraph}{\normalfont\sffamily\leavevmode\color{documentColor}}
 \addtokomafont{title}{\normalfont\sffamily\leavevmode\color{documentColor}}
 \addtokomafont{captionlabel}{\bfseries\sffamily\leavevmode\color{documentColor}}
-\addtokomafont{pageheadfoot}{\footnotesize\normalfont\sffamily\leavevmode\color{black!55}}
+\addtokomafont{pageheadfoot}{\footnotesize\normalfont\sffamily\leavevmode\color{black!55}\scshape}
 \addtokomafont{pagenumber}{\footnotesize\normalfont\sffamily\leavevmode\color{black!55}}
 \addtokomafont{caption}{\sffamily\footnotesize\leavevmode\color{black!67}}
 \newlength{\chapternumberskip}
@@ -178,15 +180,15 @@ keepaspectratio]{imports/thi_logo.eps}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % section numbers in margin
-\renewcommand\sectionlinesformat[4]{%
-  \makebox[0pt][r]{#3}#4%
-}
+% \renewcommand\sectionlinesformat[4]{%
+%   \makebox[0pt][r]{#3}#4%
+% }
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Header
-\usepackage[automark,markcase=upper]{scrlayer-scrpage}
+\usepackage[automark]{scrlayer-scrpage}
 \clearpairofpagestyles
 % % only chapters
 % \automark{chapter}
@@ -209,7 +211,7 @@ keepaspectratio]{imports/thi_logo.eps}
 
 \rohead{\smash{\textcolor{documentColor}{\rule[-4pt]{\ruleWidth}{\voffset+\topmargin+\headheight+1in}}}\makebox[\pageNumperSpace][c]{\oldstylenums\pagemark}\hspace{\pageNumberHeaderSkip}}
 \lehead{\hspace{\pageNumberHeaderSkip}\makebox[\pageNumperSpace][c]{\oldstylenums\pagemark}\smash{\textcolor{documentColor}{\rule[-4pt]{\ruleWidth}{\voffset+\topmargin+\headheight+1in}}}}
-\cohead{\raggedleft{\headmark} \hspace{\chapterHeaderSkip}}
+\cohead{\raggedleft{\textls[100]{\headmark}} \hspace{\chapterHeaderSkip}}
 \cehead{\hspace{\chapterHeaderSkip} \raggedright{\headmark} }
 % no chapter number in header
 \renewcommand*{\chaptermarkformat}{}
@@ -246,7 +248,7 @@ keepaspectratio]{imports/thi_logo.eps}
     %     \fill[documentColor!50] ($(current page.north) + (-5,0)$) -- ($(current page.45) + (0,1.1)$) -- ($(current page.45) + (0,4)$) -- cycle ;
     %     \fill[documentColor] (current page.north) -- ($(current page.45) + (0,0.8)$) -- ($(current page.45) + (0,4)$) -- cycle ;
     % \end{tikzpicture}
-    \parbox[t]{\textwidth}{\raggedchapter\MakeUppercase{#3}}%
+    \parbox[t]{\textwidth}{\raggedchapter\scshape{#3}}%
     #2%
 }
 
