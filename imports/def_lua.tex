@@ -1,12 +1,12 @@
 %!TEX root = ../document.tex
 \documentclass[oneside,11pt,DIV=8,headings=openright]{scrreprt}
 \usepackage{scrhack}
-\usepackage[utf8]{inputenc}
+\usepackage{fontspec}
 \usepackage[ngerman]{babel}
-\usepackage{cabin}
-\usepackage{XCharter}
 %\usepackage[default]{droidserif}
 %\usepackage{FiraSans}
+\setmainfont{MinionPro}
+\setsansfont{MinionPro}
 \usepackage{inconsolata}
 \usepackage{setspace}
 \usepackage[activate={true,nocompatibility},letterspace=60]{microtype}
@@ -19,7 +19,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %tikz
-\def\pgfsysdriver{pgfsys-pdftex.def} %for texlive 2016
+% \def\pgfsysdriver{pgfsys-pdftex.def} %for texlive 2016
 \usepackage{tikz}
 \usetikzlibrary{positioning}
 \usetikzlibrary{arrows,patterns}
@@ -100,12 +100,7 @@
 \subtitle{Master Informatik}
 \subject{Computerforensik}
 
-\author{Stefan Braun \\
-\begin{tabular}{rl}
- Matrikel & \emph{42482} \\
-Prüfer & \emph{Prof. Dr. Stefan Hahndel}
-\end{tabular}
-}
+\author{Stefan Braun \\ Matrikelnummer 42482 \\ Prüfer: Prof. Dr. Stefan Hahndel}
 \date{15. Juli 2016}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -230,8 +225,8 @@ keepaspectratio]{imports/thi_logo.eps}
 % no chapter number in header
 \renewcommand*{\chaptermarkformat}{}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 \usepackage[colorlinks, linkcolor = black, citecolor = black, filecolor = black, urlcolor = black]{hyperref}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % begin of the document

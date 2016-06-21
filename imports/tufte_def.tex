@@ -35,6 +35,13 @@
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%bib
+\usepackage[backend=biber,style=alphabetic,hyperref=true,backref=true,block=none,maxcitenames=3,maxbibnames=100]{biblatex}
+\addbibresource{imports/references.bib}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Big letters at the beginning of a chapter
 \usepackage{lettrine}
 \renewcommand{\LettrineFontHook}{\titlefont\color{black}\rmfamily}
@@ -51,7 +58,7 @@
 \usepackage[newfloat]{minted}
 \usemintedstyle{manni}
 \setminted{tabsize=4}
-\setminted{obeytabs}
+% \setminted{obeytabs}
 \setminted{linenos}
 \setminted{bgcolor=listingbackground}
 \setmintedinline{breaklines}

@@ -1,4 +1,5 @@
 %!TEX options = --shell-escape
+%!TEX program = pdflatex
 \input{imports/def}
 
 \colorlet{documentColor}{darkred}
@@ -129,7 +130,7 @@ Etwas komplexer als die im vorherigen Abschnitt vorgestellte Methode sind Anfrag
 
 \section{Statement Injection}
 
-{Statement Injection } funktioniert ähnlich wie die \mintinline{sql}{UNION} basierte Variante, jedoch wird hier eine komplette, zusätzliche SQL"=Abfrage eingefügt. Hierzu wird zuerst die aktuelle Anfrage valide vervollständigt und anschließend per Semikolon beendet. Nun kann ein eigenständiges SQL"=Statement angehängt werden -- beispielsweise \mintinline{sql}{DROP DATABASE wordpress;}. Folgender SQL"=Code kann wie im vorherigen Abschnitt erläutert einfach auskommentiert werden.
+{Statement Injection } oder auch Stacked Queries funktioniert ähnlich wie die \mintinline{sql}{UNION} basierte Variante, jedoch wird hier eine komplette, zusätzliche SQL"=Abfrage eingefügt. Hierzu wird zuerst die aktuelle Anfrage valide vervollständigt und anschließend per Semikolon beendet. Nun kann ein eigenständiges SQL"=Statement angehängt werden -- beispielsweise \mintinline{sql}{DROP DATABASE wordpress;}. Folgender SQL"=Code kann wie im vorherigen Abschnitt erläutert einfach auskommentiert werden.
 \mymarginnote[-4em]{ {\color{documentColor}\bfseries Angemerkt: }In einem \texttt{xkcd} Webcomic unter \url{https://xkcd.com/327/} löscht eine Mutter Daten der Schule: Sie hatte ihren Sohn \enquote{\texttt{Robert'); DROP TABLE Students; --}} getauft -- Ein klassisches Beispiel für eine Statement Injection.}
 
 
@@ -278,6 +279,14 @@ Die eingesetzte WAF"=Lösung \emph{ModSecurity} ist ein Webserverplugin, welches
 
 Die Filterregeln sind nicht Bestandteil von ModSecurity und müssen zusätzlich installiert und aktiviert werden. Neben dem kostenpflichtigen Angebot der Firma Trustwave -- des Herstellers von ModSecurity -- können auch frei verfügbare Regelsätze des OWASP verwendet werden.\mymarginnote{Die Regelsätze von Trustwave können für jährliche 495 Dollar lizenziert werden und beinhalten die OWASP Regeln. OWASP stellt seine Regeln unter \url{https://github.com/SpiderLabs/owasp-modsecurity-crs} zur Verfügung.} Neben der Filterung von SQL"=Injections werden auch XSS"=Attacken und Schwachstellenscanner abgewehrt.
 
+Nach Installation der Erweiterung wird diese per Kommandozeilenbefehl aktiviert.
+
+\begin{listing}[ht!]
+\begin{minted}{bash}
+> a2enmod security2
+> service apache restart
+\end{minted}
+\end{listing}
 
 
 \section{MySQL Enterprise: Datenbank und Firewall}
@@ -330,6 +339,14 @@ Als Datenbanksystem wird MySQL eingesetzt. In der kostenpflichtigen Enterprise"=
 \end{figure}
 
 
+Ist die Firewall entsprechend konfiguriert, so kann sie SQL"=Anfragen, die nicht in der Whitelist enthalten sind, ablehnen. Diese Anfragen sind somit mutmaßliche SQL"=Injections. In PHP erhält man in diesem Fall mit \mintinline{php}{mysql_error()} folgende Fehlermeldung:
+
+\begin{listing}
+\begin{minted}{text}
+Statement was blocked by Firewall
+\end{minted}
+\end{listing}
+
 
 
 \chapter{Ergebnisse}
@@ -337,6 +354,14 @@ Als Datenbanksystem wird MySQL eingesetzt. In der kostenpflichtigen Enterprise"=
 90 von 90,
 
 keine 100% bei ModSecurity "1' or' "
+
+Die große Schwierigkeit bei der Datenbankfirewall ist jedoch die Einrichtung der Whitelist. Bei großen Applikationen mit dynamischen oder von Frameworks erstellten Datenbankabfragen steigt entsprechend der Aufwand, da alle legitimen Queries mindestens einmal aufgerufen werden müssen.
+
+\printbibliography
+
+
+\chapter*{Erkl{\huge Ä}rung}
+Ich erkläre hiermit, dass ich die Arbeit selbständig verfasst, noch nicht anderweitig für Prüfungszwecke vorgelegt, keine anderen als die angegebenen Quellen oder Hilfsmittel benützt sowie wörtliche und sinngemäße Zitate als solche gekennzeichnet habe.
 
 
 \end{document}
