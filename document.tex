@@ -1,17 +1,18 @@
 %!TEX options = --shell-escape
-%!TEX program = pdflatex
-\input{imports/def}
+%!TEX program = lualatex
+\input{imports/def_lua}
 
 \colorlet{documentColor}{darkred}
 
 \begin{document}
+\include{imports/creative_commons}
 
 \tableofcontents
 
 \chapter{SQL-Injections im Jahr 2016}
 
-\mymarginnote[-2em]{Derzeit werden Daten für die kommende OWASP Top Ten 2016 gesammelt.}
-\lettrine[lines=2]{A}{}lle drei Jahre veröffentlicht das \emph{Open Web Application Security Project} -- kurz OWASP -- eine Liste der derzeit als am kritischsten eingestuften Sicherheitsrisiken in Webapplikationen. Und auch in der derzeit aktuellsten Fassung der Liste aus dem Jahr 2013 findet sich die Kategorie \enquote{Injections} auf Platz Eins wieder.
+\mymarginnote[5em]{Derzeit werden Daten für die kommende OWASP Top Ten 2016 gesammelt.}
+\lettrine[lines=2]{A}{lle drei Jahre }veröffentlicht das \emph{Open Web Application Security Project} -- kurz OWASP -- eine Liste der derzeit als am kritischsten eingestuften Sicherheitsrisiken in Webapplikationen. Und auch in der derzeit aktuellsten Fassung der Liste aus dem Jahr 2013 findet sich die Kategorie \enquote{Injections} auf Platz Eins wieder.
 
 \begin{table}[ht!]
 \begin{margincap}
@@ -106,9 +107,9 @@ In dem abstrakten Schema eines Requests aus Abbildung \ref{img:server_arch} biet
 \end{figure}
 
 \chapter{Arten von SQL-Injections}
-\lettrine[lines=2]{S}{}QL"=Injections lassen sich nach unterschiedlichen Kriterien klassifizieren. Dies geschieht in Hinblick auf die Art und Weise wie ein Angreifer die verwundbare SQL"=Anfrage entdeckt, wie er den Schadcode einfügt und schließlich Daten auslesen kann. In diesem Kapitel soll ein grober Überblick über verschiedene Ansätze von SQL"=Injections vermittelt werden.
+\lettrine[lines=2]{S}{QL"=Injections lassen sich}  nach unterschiedlichen Kriterien klassifizieren. Dies geschieht in Hinblick auf die Art und Weise wie ein Angreifer die verwundbare SQL"=Anfrage entdeckt, wie er den Schadcode einfügt und schließlich Daten auslesen kann. In diesem Kapitel soll ein grober Überblick über verschiedene Ansätze von SQL"=Injections vermittelt werden.
 
-\section{Tautologie"=basierte Injection}
+\section{Tautologie"=basierte Injections}
 
 Die einfachste Variante einer SQL"=Injection sorgt dafür, dass eine logische Überprüfung im \mintinline{sql}{WHERE}"=Teil der Abfrage immer zu \texttt{true} evaluiert und somit alle betroffenen Zeilen zurückgegeben werden. Das Paradebeispiel hierfür ist eine Abfrage zur Authentisierung eines Benutzers.
 
@@ -131,7 +132,7 @@ Etwas komplexer als die im vorherigen Abschnitt vorgestellte Methode sind Anfrag
 \section{Statement Injection}
 
 {Statement Injection } oder auch Stacked Queries funktioniert ähnlich wie die \mintinline{sql}{UNION} basierte Variante, jedoch wird hier eine komplette, zusätzliche SQL"=Abfrage eingefügt. Hierzu wird zuerst die aktuelle Anfrage valide vervollständigt und anschließend per Semikolon beendet. Nun kann ein eigenständiges SQL"=Statement angehängt werden -- beispielsweise \mintinline{sql}{DROP DATABASE wordpress;}. Folgender SQL"=Code kann wie im vorherigen Abschnitt erläutert einfach auskommentiert werden.
-\mymarginnote[-4em]{ {\color{documentColor}\bfseries Angemerkt: }In einem \texttt{xkcd} Webcomic unter \url{https://xkcd.com/327/} löscht eine Mutter Daten der Schule: Sie hatte ihren Sohn \enquote{\texttt{Robert'); DROP TABLE Students; --}} getauft -- Ein klassisches Beispiel für eine Statement Injection.}
+\mymarginnote[-4em]{ {\color{documentColor}\bfseries Angemerkt: }In einem \texttt{xkcd} Webcomic unter \url{https://xkcd.com/327/} löscht eine Mutter Daten der Schule: Sie hatte ihren Sohn \enquote{\texttt{Robert'); DROP TABLE Students; --}} getauft -- ein klassisches Beispiel für eine Statement Injection.}
 
 
 Damit derartige Angriffe unter PHP funktionieren, muss statt der Funktion \mintinline{php}{mysqli_query()} die Variante \mintinline{php}{mysqli_multi_query()} verwendet werden. Andernfalls ist die Verwendung konkatenierter SQL"=Statements nicht möglich.
@@ -193,7 +194,7 @@ Wenn eine Anfrage zwar anfällig für SQL"=Injections ist, die zugehörige Webse
 
 \chapter{Versuchsbeschreibung}
 
-Folgende Abschnitte sollen aufzeigen, wie im Zuge dieser Seminararbeit die Tauglichkeit verschiedener automatisierter Angriffs- und Verteidigungsmechanismen rund um SQL-Injections getestet wurde.
+\lettrine{F}{olgende Abschnitte sollen} aufzeigen, wie im Zuge dieser Seminararbeit die Tauglichkeit verschiedener automatisierter Angriffs- und Verteidigungsmechanismen rund um SQL-Injections getestet wurde.
 
 \section{Grundlegende Überlegungen}
 
@@ -205,7 +206,7 @@ Je eines der Beiden zu 100\% zu erfüllen ist einfach: \emph{false positives} we
 
 \section{Verwendete Werkzeuge}
 
-Bezugnehmend auf die Abbildung \ref{img:protected_server_arch} wird jeweils eine Web Application Firewall und eine Database Firewall getestet. Damit diese Tests möglich sind, muss zum einen die grundlegende Infrastruktur aufgebaut werden: Die Basis bildet ein Apache 2.4 Webserver auf einem Linux"=Serversystem.\mymarginnote{Zum Einsatz kommt ein 64"=bit Ubuntu Server. Siehe auch {\url{http://www.ubuntu.com/download/server}}} Damit Angriffe möglich sind, muss eine für SQL"=Injections verwundbare Applikation eingerichtet werden. Mögliche Schwachstellen werden schließlich automatisiert mit dem Tool \emph{sqlmap} gesucht und getestet.
+Bezugnehmend auf die Abbildung \ref{img:protected_server_arch} wird jeweils eine Web Application Firewall und eine Database Firewall getestet. Damit diese Tests möglich sind, muss zum einen die grundlegende Infrastruktur aufgebaut werden: Die Basis bildet ein Apache\,2.4 Webserver auf einem Linux"=Serversystem.\mymarginnote{Zum Einsatz kommt ein 64"=bit Ubuntu Server. Siehe auch {\url{http://www.ubuntu.com/download/server}}} Damit Angriffe möglich sind, muss eine für SQL"=Injections verwundbare Applikation eingerichtet werden. Mögliche Schwachstellen werden schließlich automatisiert mit dem Tool \emph{sqlmap} gesucht und getestet.
 
 \section{Versuchsablauf}
 
@@ -231,6 +232,9 @@ Mit dem Parameter \texttt{-u} wird die anzugreifende URL angegeben. Bereits dies
 \end{listing}
 
 sqlmap ist ebenfalls in der Lage, \texttt{POST}"=Requests durchzuführen. Hierzu werden die Parameter mit dem Argument \texttt{--data} angegeben.
+
+Ebenfalls wichtig ist die Angabe des UserAgents, den sqlmap für die Anfrage verwenden soll. Wird dieser mit dem Parameter \texttt{--user-agent} nicht spezifiziert, wird \texttt{sqlmap/1.0.6.33\#dev} verwendet. Ein derartiger UserAgent Header kann jedoch dazu führen, dass eine Anfrage von einer WAF abgelehnt wird ohne auch nur die einzelnen Parameter zu betrachten.\mymarginnote{Auch die weiteren Filterregeln von ModSecurity -- siehe Abschnitt \ref{sec:modsecurity} -- testen, ob der UserAgent den String \texttt{sqlmap} enthält. Tests könnten somit verfälscht werden, da die von sqlmap gestellten Anfragen gar nicht von den SQL"=Injections betreffenden Filterregeln geblockt werden.}
+
 
 
 \begin{listing}
@@ -264,8 +268,10 @@ Gelingt es sqlmap nicht, eine SQL"=Injection zu finden, so kann mit \texttt{--le
 \end{minted}
 \end{listing}
 
-Gerade hierfür kann die Verwendung der Argumente \texttt{-o} und \texttt{--dbms} sinnvoll sein. Mit \texttt{-o} werden allgemeine optimierende Optionen aktiviert -- etwa Multithreading -- welche die Ausführungsdauer reduzieren können. Ist das verwendete Datenbankmanagementsystem bekannt, so kann auch mit der Angabe von \texttt{--dbms} verhindert werden, dass SQL"=Injections, die für andere DBMS spezifischen Code enthalten, durchgeführt wird.\mymarginnote{Alternativ kann auch mit \texttt{--threads} die Anzahl der zu verwendenden Threads explizit angegeben werden. Der Parameter \texttt{-o} setzt standardmäßig drei Threads ein.}
+Gerade hierfür kann die Verwendung der Argumente \texttt{-o} und \texttt{--dbms} sinnvoll sein. Mit \texttt{-o} werden allgemeine optimierende Optionen aktiviert -- etwa Multithreading -- welche die Ausführungsdauer reduzieren können. Ist das verwendete Datenbankmanagementsystem bekannt, so kann auch mit der Angabe von \texttt{--dbms} verhindert werden, dass SQL"=Injections, die für andere DBMS spezifischen Code enthalten, durchgeführt wird.\mymarginnote[-7em]{Alternativ kann auch mit \texttt{--threads} die Anzahl der zu verwendenden Threads explizit angegeben werden. Der Parameter \texttt{-o} setzt standardmäßig drei Threads ein.}
 
+
+\mymarginnote{Was wenn der Computer eines Hackers beschlagnahmt wurde, der verdächtigt wird, mit sqlmap automatisiert nach Schwachstellen auf Firmenwebsites gesucht zu haben? In diesem Fall könnten die sqlmap Logdateien weiterhelfen.}Damit bei einem erneuten Suchlauf mit der selben URL Zeit gespart werden kann, legt sqlmap Sessionfiles an. Diese Dateien könnten im forensischen Sinne auch Hilfe bei der Aufklärung eines Angriffes durch sqlmap bieten. Unter Linux werden standardmäßig im Verzeichnis \texttt{~/.sqlmap/output/<target>/} drei Dateien angelegt. Eine davon ist eine session.sqlite Datenbank, die Base64 kodierte Metainformationen enthält, die beiden anderen sind Textdateien. Die Datei \texttt{target.txt} enthält das \texttt{-u} Argument -- also die angegriffene URL und die Datei \texttt{log} enthält die Ausgabe von sqlmap mit gefundenen Schwachstellen, Anzahl der durchgeführten Requests und Informationen über den angegriffenen Server.
 
 \section{Verwundbare Beispielapplikation}
 
@@ -274,19 +280,45 @@ Um die Möglichkeiten sowohl von sqlmap als auch der Firewall"=Anwendungen auszu
 Von diesen 53 Tests konnte sqlmap bei 32 mögliche SQL"=Injections finden, jeweils zwischen einer und vier verschiedenen. Diese summieren sich zu 90 verschiedenen GET"= und POST"=Anfragen auf, die die Grundlage für den Versuch darstellen. Die gefundenen SQL"=Injections lassen sich verschiedenen Kategorien zu ordnen, unter anderem Time-based und Error-based Injections waren vertreten.
 
 \section{Apache und ModSecurity}
+\label{sec:modsecurity}
 
 Die eingesetzte WAF"=Lösung \emph{ModSecurity} ist ein Webserverplugin, welches für nginx, IIS und Apache verfügbar ist. Es basiert darauf, eingehende Serveranfragen anhand von Filterregeln auf potentielle Angriffe hin zu untersuchen. Matchen eine oder mehrere dieser Regeln, so kann die Anfrage abgelehnt oder geloggt werden\mymarginnote{Entsprechend ist die Verhaltensweise ein \emph{Intrusion Detection System} oder ein \emph{Intrusion Prevention System}.}.
 
-Die Filterregeln sind nicht Bestandteil von ModSecurity und müssen zusätzlich installiert und aktiviert werden. Neben dem kostenpflichtigen Angebot der Firma Trustwave -- des Herstellers von ModSecurity -- können auch frei verfügbare Regelsätze des OWASP verwendet werden.\mymarginnote{Die Regelsätze von Trustwave können für jährliche 495 Dollar lizenziert werden und beinhalten die OWASP Regeln. OWASP stellt seine Regeln unter \url{https://github.com/SpiderLabs/owasp-modsecurity-crs} zur Verfügung.} Neben der Filterung von SQL"=Injections werden auch XSS"=Attacken und Schwachstellenscanner abgewehrt.
+Die Filterregeln sind nicht Bestandteil von ModSecurity und müssen zusätzlich installiert und aktiviert werden. Neben dem kostenpflichtigen Angebot der Firma Trustwave -- des Herstellers von ModSecurity -- können auch frei verfügbare Regelsätze des OWASP verwendet werden.\myothermarginnote[15em]{Die Regelsätze von Trustwave können für jährliche 495 Dollar lizenziert werden und beinhalten die OWASP Regeln. OWASP stellt seine Regeln unter Github\footnote{\url{https://github.com/SpiderLabs/owasp-modsecurity-crs}} zur Verfügung.} Neben der Filterung von SQL"=Injections werden auch XSS"=Attacken und Schwachstellenscanner abgewehrt.
 
 Nach Installation der Erweiterung wird diese per Kommandozeilenbefehl aktiviert.
 
 \begin{listing}[ht!]
 \begin{minted}{bash}
 > a2enmod security2
-> service apache restart
+> service apache2 restart
 \end{minted}
 \end{listing}
+
+
+Treffen installierte Regellisten auf eine Anfrage zu, so wird diese in der Logdatei \texttt{/var/log/apache2/modsec\_audit.log} protokolliert. Ist ModSecurity entsprechend konfiguriert, werden potentiell gefährliche Anfragen nicht nur geloggt sondern auch abgelehnt. In diesem Fall gelangt die Anfrage gar nicht erst zur eigentlichen Applikation, der Aufrufer erhält einen HTTP-403 Fehlercode \emph{Forbidden}.
+
+\begin{listing}[ht!]
+% \begin{marginpar}
+
+\begin{minted}[breaklines]{text}
+Message: Access denied with code 403 (phase 2). Operator GE matched 3 at TX:sqli_select_statement_count.
+[file "modsecurity_crs_41_sql_injection_attacks.conf"]
+[line "108"] [id "981317"] [rev "2"] [msg "SQL SELECT Statement Anomaly Detection Alert"]
+[data "Matched Data: Cache-control found within TX:sqli_select_statement_count: 3"]
+[maturity "8"] [accuracy "8"] [tag "OWASP_CRS/WEB_ATTACK/SQL_INJECTION"]
+Action: Intercepted (phase 2)
+Stopwatch: 1466544262572653 1265 (- - -)
+Stopwatch2: 1466544262572653 1265; combined=692, p1=186, p2=461, p3=0, p4=0, p5=44, sr=55, sw=1, l=0, gc=0
+Response-Body-Transformed: Dechunked
+Producer: ModSecurity for Apache/2.9.0 (http://www.modsecurity.org/); OWASP_CRS/2.2.9.
+Server: Apache/2.4.18 (Ubuntu)
+Engine-Mode: "ENABLED"
+\end{minted}
+% \caption[]{Auszug aus der Logdatei von ModSecurity. Die Anfrage wurde abgelehnt, weil ein GET"=Parameter ein \texttt{UNION ALL SELECT} enthielt.}
+% \end{marginpar}
+\end{listing}
+
 
 
 \section{MySQL Enterprise: Datenbank und Firewall}
@@ -333,7 +365,7 @@ Als Datenbanksystem wird MySQL eingesetzt. In der kostenpflichtigen Enterprise"=
 
 \end{tikzpicture}
 
-\caption[db firewall]{Diese Grafik skizziert die Funktionsweise der MySQL Datenbankfirewall.\footnote{nach \url{http://dev.mysql.com/doc/refman/5.6/en/firewall.html}} Eingehende SQL"=Anfragen werden geparst und in Tokens zerlegt. Pro Datenbankbenutzer existiert nun eine Whitelist mit zulässigen Abfragen: Ist der Lernmodus aktiv, so werden alle neuen Anfragen in die Whitelist mit aufgenommen. Wird die Firewall aktiviert, so werden neue Anfragen je nach Einstellung nur geloggt oder auch abgelehnt. Entsprechend kann die Datenbankfirewall wieder als IDS oder IDP konfiguriert werden. }
+\caption[db firewall]{Diese Grafik skizziert die Funktionsweise der MySQL Datenbankfirewall.\footnote{\RaggedRight nach \url{http://dev.mysql.com/doc/refman/5.6/en/firewall.html}} Eingehende SQL"=Anfragen werden geparst und in Tokens zerlegt. Pro Datenbankbenutzer existiert nun eine Whitelist mit zulässigen Abfragen: Ist der Lernmodus aktiv, so werden alle neuen Anfragen in die Whitelist mit aufgenommen. Wird die Firewall aktiviert, so werden neue Anfragen je nach Einstellung nur geloggt oder auch abgelehnt. Entsprechend kann die Datenbankfirewall wieder als IDS oder IDP konfiguriert werden. }
 \label{img:db_firewall}
 \end{margincap}
 \end{figure}
@@ -341,7 +373,7 @@ Als Datenbanksystem wird MySQL eingesetzt. In der kostenpflichtigen Enterprise"=
 
 Ist die Firewall entsprechend konfiguriert, so kann sie SQL"=Anfragen, die nicht in der Whitelist enthalten sind, ablehnen. Diese Anfragen sind somit mutmaßliche SQL"=Injections. In PHP erhält man in diesem Fall mit \mintinline{php}{mysql_error()} folgende Fehlermeldung:
 
-\begin{listing}
+\begin{listing}[ht!]
 \begin{minted}{text}
 Statement was blocked by Firewall
 \end{minted}
@@ -361,7 +393,12 @@ Die große Schwierigkeit bei der Datenbankfirewall ist jedoch die Einrichtung de
 
 
 \chapter*{Erkl{\huge Ä}rung}
-Ich erkläre hiermit, dass ich die Arbeit selbständig verfasst, noch nicht anderweitig für Prüfungszwecke vorgelegt, keine anderen als die angegebenen Quellen oder Hilfsmittel benützt sowie wörtliche und sinngemäße Zitate als solche gekennzeichnet habe.
+\mymarginnote[-2em]{nach \enquote{Muster für die Erklärung nach §\,18 Abs.\,4 Nr.\,7 APO HI}}
+\lettrine{I}{ch erkläre hiermit,} dass ich die Arbeit selbständig verfasst, noch nicht anderweitig für Prüfungszwecke vorgelegt, keine anderen als die angegebenen Quellen oder Hilfsmittel benützt sowie wörtliche und sinngemäße Zitate als solche gekennzeichnet habe.
 
+\vspace{2\baselineskip}
+\noindent Ingolstadt, den \today
+\par\noindent\makebox[2.5in]{} \hfill\makebox[2.0in]{\hrulefill}%
+\par\noindent\makebox[2.5in][l]{} \hfill\makebox[2.0in][l]{{\zapfinofont\huge Stefan Braun}}
 
 \end{document}

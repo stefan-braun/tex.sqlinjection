@@ -1,4 +1,7 @@
 %!TEX root = ../document.tex
+%!TEX options = --shell-escape
+%!TEX program = lualatex
+\RequirePackage{luatex85}
 \documentclass[oneside,11pt,DIV=8,headings=openright]{scrreprt}
 \usepackage{scrhack}
 \usepackage{fontspec}
@@ -6,20 +9,21 @@
 %\usepackage[default]{droidserif}
 %\usepackage{FiraSans}
 \setmainfont{MinionPro}
-\setsansfont{MinionPro}
-\usepackage{inconsolata}
+\setmonofont{Ubuntu Mono}
+\setsansfont{MyriadPro}
 \usepackage{setspace}
 \usepackage[activate={true,nocompatibility},letterspace=60]{microtype}
-\usepackage[T1]{fontenc}
+\usepackage{calc}
 \usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
 \usepackage[letterpaper,left=1in,top=1in,headsep=2\baselineskip,textwidth=26pc,marginparsep=2pc,marginparwidth=12pc,textheight=44\baselineskip,headheight=\baselineskip]{geometry}
 \usepackage{blindtext}
 \usepackage{amsmath}
 
+\newfontfamily\zapfinofont{ZapfinoExtraLT-One}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %tikz
-% \def\pgfsysdriver{pgfsys-pdftex.def} %for texlive 2016
+\def\pgfsysdriver{pgfsys-pdftex.def} %for texlive 2016
 \usepackage{tikz}
 \usetikzlibrary{positioning}
 \usetikzlibrary{arrows,patterns}
@@ -62,11 +66,14 @@
 \usepackage[newfloat]{minted}
 \usemintedstyle{manni}
 \setminted{tabsize=4}
+% \setminted{xleftmargin=-2em}
 % \setminted{obeytabs}
 \setminted{linenos}
 \setminted{bgcolor=listingbackground}
 \setmintedinline{breaklines}
 \setmintedinline{bgcolor={}}
+% \renewcommand{\theFancyVerbLine}{\sffamily\textcolor{documentColor!80}{\scriptsize\oldstylenums{\arabic{FancyVerbLine}}}}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -84,6 +91,7 @@
 \definecolor{tableHeaderText}{RGB}{255,255, 255}
 \definecolor{tableHeader}{RGB}{211, 47, 0}
 \definecolor{listingbackground}{HTML}{F4F4F4}
+\definecolor{mySteelBlue}{HTML}{2A4E6C}
 \definecolor{tableLineOne}{RGB}{245, 245, 245}
 \definecolor{tableLineTwo}{RGB}{224, 224, 224}
 \definecolor{THI-Blue}{RGB}{1,90,156}
@@ -100,18 +108,23 @@
 \subtitle{Master Informatik}
 \subject{Computerforensik}
 
-\author{Stefan Braun \\ Matrikelnummer 42482 \\ Prüfer: Prof. Dr. Stefan Hahndel}
+\author{{ Stefan Braun} \\
+\begin{tabular}{rl}
+ Matrikel & \emph{42482} \\
+Prüfer & \emph{Prof. Dr. Stefan Hahndel}
+\end{tabular}
+}
 \date{15. Juli 2016}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Section font settings
-\addtokomafont{chapter}{\normalfont\sffamily\Huge\leavevmode\color{documentColor}\lsstyle}
-\addtokomafont{section}{\normalfont\sffamily\leavevmode\color{documentColor}}
-\addtokomafont{subsection}{\normalfont\sffamily\leavevmode\color{documentColor}}
-\addtokomafont{subsubsection}{\normalfont\sffamily\leavevmode\color{documentColor}}
-\addtokomafont{paragraph}{\normalfont\sffamily\leavevmode\color{documentColor}}
+\addtokomafont{chapter}{\normalfont\rmfamily\Huge\leavevmode\color{documentColor}\lsstyle}
+\addtokomafont{section}{\normalfont\rmfamily\leavevmode\color{documentColor}\scshape\MakeLowercase}
+\addtokomafont{subsection}{\normalfont\rmfamily\leavevmode\color{documentColor}}
+\addtokomafont{subsubsection}{\normalfont\rmfamily\leavevmode\color{documentColor}}
+\addtokomafont{paragraph}{\normalfont\rmfamily\leavevmode\color{documentColor}}
 \addtokomafont{title}{\normalfont\sffamily\leavevmode\color{documentColor}}
 \addtokomafont{captionlabel}{\bfseries\sffamily\leavevmode\color{documentColor}}
 \addtokomafont{pageheadfoot}{\footnotesize\normalfont\sffamily\leavevmode\color{black!55}\scshape}
@@ -120,7 +133,7 @@
 \newlength{\chapternumberskip}
 \setlength{\chapternumberskip}{\textwidth+\marginparsep+0.5\marginparwidth+2cm}
  % \renewcommand*{\chapterformat}{   \rlap{\makebox[\chapternumberskip][r]{\fontsize{60}{68}\fontseries{t}\selectfont\color{black!50}\raisebox{-0.35em}{\thechapter\autodot}}}}
- \renewcommand*{\chapterformat}{\hspace*{\marginparsep}{\fontsize{60}{68}\selectfont\leavevmode\color{black!50}\thechapter\autodot}}
+ \renewcommand*{\chapterformat}{\hspace*{\marginparsep}{\fontsize{100}{70}\zapfinofont\leavevmode\color{black!50}\thechapter\autodot}}
 \RedeclareSectionCommand[afterskip=2\baselineskip, beforeskip=1sp minus 1sp]{chapter}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -166,6 +179,19 @@
     \noindent
     #2
     }[#1]%
+}
+
+\newcommand\myothermarginnote[2][0pt]{
+  \marginpar{% needs marginnote package
+    \begin{minipage}{\marginparwidth}
+    \lineskiplimit=-\maxdimen%
+    \normalfont\sffamily\footnotesize\color{black!70}%
+    \justify
+    \noindent
+    \vspace{#1}\\
+    {#2}
+    \end{minipage}
+    }%
 }
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -220,13 +246,13 @@ keepaspectratio]{imports/thi_logo.eps}
 
 \rohead{\smash{\textcolor{documentColor}{\rule[-4pt]{\ruleWidth}{\voffset+\topmargin+\headheight+1in}}}\makebox[\pageNumperSpace][c]{\oldstylenums\pagemark}\hspace{\pageNumberHeaderSkip}}
 \lehead{\hspace{\pageNumberHeaderSkip}\makebox[\pageNumperSpace][c]{\oldstylenums\pagemark}\smash{\textcolor{documentColor}{\rule[-4pt]{\ruleWidth}{\voffset+\topmargin+\headheight+1in}}}}
-\cohead{\raggedleft{\textls[100]{\headmark}} \hspace{\chapterHeaderSkip}}
-\cehead{\hspace{\chapterHeaderSkip} \raggedright{\headmark} }
+\cohead{\raggedleft{\textls[100]{ \MakeUppercase \headmark}} \hspace{\chapterHeaderSkip}}
+\cehead{\hspace{\chapterHeaderSkip} \raggedright{\textls[100]{\MakeUppercase \headmark}} }
 % no chapter number in header
 \renewcommand*{\chaptermarkformat}{}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\usepackage[colorlinks, linkcolor = black, citecolor = black, filecolor = black, urlcolor = black]{hyperref}
 
+\usepackage[colorlinks, linkcolor = mySteelBlue, citecolor = mySteelBlue, filecolor = mySteelBlue, urlcolor = mySteelBlue]{hyperref}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % begin of the document
@@ -261,7 +287,10 @@ keepaspectratio]{imports/thi_logo.eps}
     %     \fill[documentColor] (current page.north) -- ($(current page.45) + (0,0.8)$) -- ($(current page.45) + (0,4)$) -- cycle ;
     % \end{tikzpicture}
     \parbox[t]{\textwidth}{\raggedchapter\scshape{#3}}%
-    #2%
+    \vspace*{1cm}
+    \hspace*{\textwidth}\mbox{#2}
+
+    \vspace*{-2.8cm}
 }
 
 \makeatother
