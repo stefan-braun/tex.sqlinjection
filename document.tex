@@ -1,6 +1,6 @@
 %!TEX options = --shell-escape
-%!TEX program = lualatex
-\input{imports/def_lua}
+%!TEX program = pdflatex
+\input{imports/def}
 
 \colorlet{documentColor}{darkred}
 
@@ -9,9 +9,25 @@
 
 \tableofcontents
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 \chapter{SQL-Injections im Jahr 2016}
 
-\mymarginnote[5em]{Derzeit werden Daten für die kommende OWASP Top Ten 2016 gesammelt.}
+\mymarginnote[4em]{Derzeit werden Daten für die kommende OWASP Top Ten 2016 gesammelt.}
 \lettrine[lines=2]{A}{lle drei Jahre }veröffentlicht das \emph{Open Web Application Security Project} -- kurz OWASP -- eine Liste der derzeit als am kritischsten eingestuften Sicherheitsrisiken in Webapplikationen. Und auch in der derzeit aktuellsten Fassung der Liste aus dem Jahr 2013 findet sich die Kategorie \enquote{Injections} auf Platz Eins wieder.
 
 \begin{table}[ht!]
@@ -42,34 +58,35 @@ Es stellt sich folglich die Frage, wie derartige Angriffe verhindert werden kön
 
 Wenn also die Verhinderung von SQL"=Injections eine triviale Angelegenheit ist, weshalb bestimmen auch heutzutage Nachrichten über aktuelle, derartige Angriffe die Fachpresse? Die Gründe hierfür sind vielfältig. Möglicherweise ist veraltete Software im Einsatz oder dem Entwickler mangelt es schlicht an Vorwissen im Bereich der IT"=Sicherheit. \mymarginnote[-3em]{Ein weiteres Beispiel könnte zugekaufte Fremdsoftware darstellen, die im eigenen Netzwerk betrieben wird.} Ebenfalls vorstellbar ist Software, die nicht mehr geändert werden kann -- etwa weil der Aufwand zu groß wäre, keine Entwickler vorhanden sind, oder aber der zugehörige Sourcecode nicht zur Verfügung steht. Außerdem können Queries konstruiert werden, die ein fachliches Problem zwar auf einfache Weise lösen, andererseits jedoch die Verwendung eines parametrisierten Prepared Statements unmöglich machen.
 
-\begin{listing}
+\begin{listing}[htbp!]
 \begin{margincap}
 \inputminted[startinline,obeytabs]{php}{imports/weak_features.php}
-\caption{In diesem PHP"=Code wird mit der Variable \mintinline{php}{choosenText} eine Spalte und mit \mintinline{php}{sorting} eine Sortierreihenfolge ausgewählt. In beiden Fällen können keine Parameter für Prepared Statements verwendet werden.}
+\caption[asd]{In diesem PHP"=Code wird mit der Variable \texttt{choosenText} eine Spalte und mit \texttt{sorting} eine Sortierreihenfolge ausgewählt. In beiden Fällen können keine Parameter für Prepared Statements verwendet werden.}
 \label{lst:strange_query}
 \end{margincap}
 \end{listing}
 
+
+
 \section{Alternativen}
 In all diesen Fällen muss die gefährdete Applikation also auf andere Art und Weise abgesichert werden. Ein gängiger Ansatz zur Realisierung einer solchen Schutzmaßnahme stellt eine vorgeschaltete Softwarekomponente dar, welche auf Basis von Filterregeln einzelne Requests verwirft oder modifiziert. Hierzu soll zuerst ein übliches Schema einer Client"=Server"=Architektur skizziert werden.
 
-\begin{figure}
+\begin{figure}[ht!]
 \begin{margincap}
 \centering
-\begin{tikzpicture}[every node/.style={ultra thick,draw=black!60, font=\large\sffamily\color{black!60},inner sep=8pt,text height=1.5ex,text depth=.25ex,node distance=1.2cm,}]
+\begin{tikzpicture}[every node/.style={ultra thick,draw=black!60, font=\large\sffamily\color{white},inner sep=8pt,text height=1.5ex,text depth=.25ex,node distance=1.2cm,fill=black!60}]
 \node(hacker) {Client};
 \node[right = of hacker.east, minimum width = 3pt,fill=darkred, minimum height=3cm](firewall)  {};
-\node[below =0.1cm of firewall.south,draw=none] {Firewall};
+\node[below = 0.1cm of firewall.south,draw=none,fill=none,font=\large\sffamily\color{black!60}] {Firewall};
 
 
 \node[right = of firewall.east](server)  {Webserver};
-\node[right = of server.east](app)  {Anwendung};
+\node[right = of server.east,yshift=1cm](app)  {Anwendung};
 \node[below = of app.south](db)  {Datenbank};
 
 
-\draw[ultra thick,draw=black!60,] (hacker) -- (firewall) -- (server) -- (app) -- (db);
+\draw[ultra thick,draw=black!60,] (hacker) -- (firewall) -- (server) |- (app) -- (db);
 \end{tikzpicture}
-
 \caption{Zugriffe auf eine Webserverapplikation passieren üblicherweise zuerst eine Firewall und werden anschließend von einem Webserver -- etwa \emph{Apache} -- zur Applikation weitergeleitet. Diese Applikation kann anschließend auf den Datenbankserver zugreifen.}
 \label{img:server_arch}
 \end{margincap}
@@ -80,31 +97,52 @@ In all diesen Fällen muss die gefährdete Applikation also auf andere Art und W
 \mymarginnote[-2em]{Ein Beispiel hierfür stellen etwa \emph{Load Balancer} zur Lastverteilung auf mehrere Server dar.}
 In aktuellen Webserverarchitekturen können weitere Komponenten enthalten sein, die an dieser Stelle jedoch vernachlässigt und abstrahiert werden sollen.
 
-In dem abstrakten Schema eines Requests aus Abbildung \ref{img:server_arch} bieten sich zwei Stellen an, an welchen einzelne Parameter der Anfrage auf ihre Gefährlichkeit in Bezug auf SQL"=Injections hin untersucht werden können. Analysiert man die beispielsweise die GET und POST Parameter eines Requests noch bevor sie beim Webserver ankommt, spricht man von einer \emph{Web Application Firewall}. Alternativ können auch die Zugriffe auf den Datenbankserver selbst untersucht werden -- und zwar von einer vorgeschalteten \emph{Datenbank"=Firewall.}\mymarginnote[-4em]{Sowohl Web Application Firewall als auch Datenbank"=Firewall stellen \emph{Intrusion Detection} Systeme dar.} Es stellt sich die Frage, inwiefern die beiden Ansätze in Bezug auf ihre Effektivität miteinander vergleichbar sind -- und ob sie einen wirksamen Schutz vor SQL"=Injections bieten können.
+In dem abstrakten Schema eines Requests aus Abbildung \ref{img:server_arch} bieten sich zwei Stellen an, an welchen einzelne Parameter der Anfrage auf ihre Gefährlichkeit in Bezug auf SQL"=Injections hin untersucht werden können. Analysiert man die beispielsweise die GET und POST Parameter eines Requests noch bevor sie beim Webserver ankommt, spricht man von einer \emph{Web Application Firewall}. Alternativ können auch die Zugriffe auf den Datenbankserver selbst untersucht werden -- und zwar von einer vorgeschalteten \emph{Datenbank"=Firewall.}\mymarginnote[-2em]{Sowohl Web Application Firewall als auch Datenbank"=Firewall stellen \emph{Intrusion Detection} Systeme dar.} Es stellt sich die Frage, inwiefern die beiden Ansätze in Bezug auf ihre Effektivität miteinander vergleichbar sind -- und ob sie einen wirksamen Schutz vor SQL"=Injections bieten können.
 
 
-\begin{figure}
+\begin{figure}[htbp!]
 \begin{margincap}
 \centering
-\begin{tikzpicture}[every node/.style={ultra thick,draw=black!60, font=\large\sffamily\color{black!60},inner sep=8pt,text height=1.5ex,text depth=.25ex,node distance=0.5cm,}]
+\begin{tikzpicture}[every node/.style={ultra thick,draw=black!60, font=\large\sffamily\color{white},inner sep=8pt,text height=1.5ex,text depth=.25ex,node distance=0.7cm,fill=black!60}]
 \node(hacker) {Hacker};
 \node[right = of hacker.east, minimum width = 3pt,fill=darkred, minimum height=3cm](firewall)  {};
-\node[below =0.1cm of firewall.south,draw=none] {Firewall};
+\node[below = 0.1cm of firewall.south,draw=none,fill=none,font=\large\sffamily\color{black!60}] {Firewall};
 
 
 \node[right = of firewall.east](server)  {Webserver};
 \node[right = of server.east,fill = documentColor,font=\large\sffamily\color{white}](waf)  {WAF};
-\node[right = of waf.east](app)  {Anwendung};
+\node[right = of waf.east,yshift=1.6cm](app)  {Anwendung};
 \node[below = of app.south,fill = documentColor,font=\large\sffamily\color{white}](dbf)  {DB-Firewall};
 \node[below = of dbf.south](db)  {Datenbank};
 
 
-\draw[ultra thick,draw=black!60,] (hacker) -- (firewall) -- (server) -- (waf) -- (app) -- (dbf) -- (db);
+\draw[ultra thick,draw=black!60,] (hacker) -- (firewall) -- (server) -- (waf) |- (app) -- (dbf) -- (db);
 \end{tikzpicture}
 \caption{In die Abbildung \ref{img:server_arch} wurden an den entsprechenden Stellen Schutzmechanismen eingefügt. Möglichkeiten hierfür sind eine \emph{Web-Application Firewall} -- kurz WAF -- und eine \emph{Datenbank-Firewall}. Es stellt sich die Frage, wie effektiv die jeweiligen Maßnahmen SQL"=Injections mitigieren können.}
 \label{img:protected_server_arch}
 \end{margincap}
 \end{figure}
+
+
+
+\begin{listing}
+\begin{margincap}
+\inputminted[startinline]{php}{imports/selfmade_waf.php}
+\caption[login]{ }
+\label{lst:selfmade_waf}
+\end{margincap}
+\end{listing}
+
+
+
+
+
+
+
+
+
+
+
 
 \chapter{Arten von SQL-Injections}
 \lettrine[lines=2]{S}{QL"=Injections lassen sich}  nach unterschiedlichen Kriterien klassifizieren. Dies geschieht in Hinblick auf die Art und Weise wie ein Angreifer die verwundbare SQL"=Anfrage entdeckt, wie er den Schadcode einfügt und schließlich Daten auslesen kann. In diesem Kapitel soll ein grober Überblick über verschiedene Ansätze von SQL"=Injections vermittelt werden.
@@ -116,8 +154,8 @@ Die einfachste Variante einer SQL"=Injection sorgt dafür, dass eine logische Ü
 
 \begin{listing}
 \begin{margincap}
-\inputminted[startinline,obeytabs]{php}{imports/login_1.php}
-\caption{Eine einfache Anmeldungslogik: Wird in der Datenbank ein Nutzer mit dem übergebenen Nutzernamen und Passwort gefunden, wird eine Sessionvariable gesetzt. }
+\inputminted[startinline]{php}{imports/login_1.php}
+\caption[login]{Eine einfache Anmeldungslogik: Wird in der Datenbank ein Nutzer mit dem übergebenen Nutzernamen und Passwort gefunden, wird eine Sessionvariable gesetzt. Die Variablen \texttt{username} und \texttt{password} sind üblicherweise POST"=Parameter, die an dieser Stelle ungeprüft in das SQL"=Statement eingebunden werden. Stattdessen sollten besser Prepared Statements verwendet werden, die auch in PHP verfügbar sind.\footnote{\url{http://php.net/manual/de/mysqli.quickstart.prepared-statements.php}} }
 \label{lst:login_query}
 \end{margincap}
 \end{listing}
@@ -132,7 +170,9 @@ Etwas komplexer als die im vorherigen Abschnitt vorgestellte Methode sind Anfrag
 \section{Statement Injection}
 
 {Statement Injection } oder auch Stacked Queries funktioniert ähnlich wie die \mintinline{sql}{UNION} basierte Variante, jedoch wird hier eine komplette, zusätzliche SQL"=Abfrage eingefügt. Hierzu wird zuerst die aktuelle Anfrage valide vervollständigt und anschließend per Semikolon beendet. Nun kann ein eigenständiges SQL"=Statement angehängt werden -- beispielsweise \mintinline{sql}{DROP DATABASE wordpress;}. Folgender SQL"=Code kann wie im vorherigen Abschnitt erläutert einfach auskommentiert werden.
-\mymarginnote[-4em]{ {\color{documentColor}\bfseries Angemerkt: }In einem \texttt{xkcd} Webcomic unter \url{https://xkcd.com/327/} löscht eine Mutter Daten der Schule: Sie hatte ihren Sohn \enquote{\texttt{Robert'); DROP TABLE Students; --}} getauft -- ein klassisches Beispiel für eine Statement Injection.}
+\myothermarginnote[-4em]{ {\color{documentColor}\bfseries Angemerkt: }In einem \texttt{xkcd} Webcomic unter \url{https://xkcd.com/327/} löscht eine Mutter Daten der Schule: Sie hatte ihren Sohn \enquote{\texttt{Robert'); DROP TABLE Students; --}} getauft -- ein klassisches Beispiel für eine Statement Injection.
+
+Ein reales Beispiel hierfür findet sich in den handgeschriebenen Stimmzetteldaten\footnote{ \RaggedRight veröffentlicht unter \url{http://www.val.se/val/val2010/handskrivna/handskrivna.skv}} einer Wahl in Schweden: Diese enthielten ebenfalls \texttt{DROP} Statements, der Injection"=Versuch blieb allerdings folgenlos, es wurden keine Daten verändert.}
 
 
 Damit derartige Angriffe unter PHP funktionieren, muss statt der Funktion \mintinline{php}{mysqli_query()} die Variante \mintinline{php}{mysqli_multi_query()} verwendet werden. Andernfalls ist die Verwendung konkatenierter SQL"=Statements nicht möglich.
@@ -192,6 +232,23 @@ Wenn eine Anfrage zwar anfällig für SQL"=Injections ist, die zugehörige Webse
 \end{margincap}
 \end{listing}
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 \chapter{Versuchsbeschreibung}
 
 \lettrine{F}{olgende Abschnitte sollen} aufzeigen, wie im Zuge dieser Seminararbeit die Tauglichkeit verschiedener automatisierter Angriffs- und Verteidigungsmechanismen rund um SQL-Injections getestet wurde.
@@ -200,13 +257,11 @@ Wenn eine Anfrage zwar anfällig für SQL"=Injections ist, die zugehörige Webse
 
 Wenn die Bewertung einer derartigen Abwehrmaßnahme zum Thema wird, kommen zwei einfache Metriken in Frage: die Anzahl der \emph{false positives} und die der \emph{true negatives}. Wie viele HTTP"=Anfragen führen zwar zu SQL"=Injections, werden jedoch nicht erkannt -- und auf der anderen Seite: Wie viele Anfragen werden verworfen, obwohl sie eigentlich ungefährlich sind?
 
-Je eines der Beiden zu 100\% zu erfüllen ist einfach: \emph{false positives} werden verhindert, indem die Firewall alle Anfragen blockiert, \emph{true negatives} treten nicht auf, wenn keine einzige Überprüfung stattfindet oder die Abwehrmaßnahme komplett deaktiviert wird. Da beide Extreme üblicherweise unerwünscht sind, gilt es ein passendes Mittelmaß zu finden.
-
-\mymarginnote{Um ein Beispiel zu geben: Einem harmlosen Benutzer, der sich \texttt{"DROP DATABASE"} nennen möchte, eine Fehlermeldung zu präsentieren, ist der Wirtschaftlichkeit der Website meist weniger abträglich als das Löschen der kompletten Datenbank.}Es sei zudem darauf hingewiesen, dass die Nichterkennung einer SQL"=Injection größeren Schaden verursachen kann als das versehentliche Verwerfen einer normalen Anfrage.
+Je eines der Beiden zu 100\% zu erfüllen ist einfach: \emph{false positives} werden verhindert, indem die Firewall alle Anfragen blockiert, \emph{true negatives} treten nicht auf, wenn keine einzige Überprüfung stattfindet oder die Abwehrmaßnahme komplett deaktiviert wird. Da beide Extreme üblicherweise unerwünscht sind, gilt es ein passendes Mittelmaß zu finden. \mymarginnote[-6em]{Um ein Beispiel zu geben: Einem harmlosen Benutzer, der sich \texttt{"DROP DATABASE"} nennen möchte, eine Fehlermeldung zu präsentieren, ist der Wirtschaftlichkeit der Website meist weniger abträglich als das Löschen der kompletten Datenbank.}Es sei zudem darauf hingewiesen, dass die Nichterkennung einer SQL"=Injection größeren Schaden verursachen kann als das versehentliche Verwerfen einer normalen Anfrage.
 
 \section{Verwendete Werkzeuge}
 
-Bezugnehmend auf die Abbildung \ref{img:protected_server_arch} wird jeweils eine Web Application Firewall und eine Database Firewall getestet. Damit diese Tests möglich sind, muss zum einen die grundlegende Infrastruktur aufgebaut werden: Die Basis bildet ein Apache\,2.4 Webserver auf einem Linux"=Serversystem.\mymarginnote{Zum Einsatz kommt ein 64"=bit Ubuntu Server. Siehe auch {\url{http://www.ubuntu.com/download/server}}} Damit Angriffe möglich sind, muss eine für SQL"=Injections verwundbare Applikation eingerichtet werden. Mögliche Schwachstellen werden schließlich automatisiert mit dem Tool \emph{sqlmap} gesucht und getestet.
+Bezugnehmend auf die Abbildung \ref{img:protected_server_arch} wird jeweils eine Web Application Firewall und eine Database Firewall getestet. Damit diese Tests möglich sind, muss zum einen die grundlegende Infrastruktur aufgebaut werden: Die Basis bildet ein Apache\,2.4 Webserver auf einem Linux"=Serversystem.\mymarginnote[-1em]{Zum Einsatz kommt ein 64"=bit Ubuntu Server. Siehe auch {\url{http://www.ubuntu.com/download/server}}} Damit Angriffe möglich sind, muss eine für SQL"=Injections verwundbare Applikation eingerichtet werden. Mögliche Schwachstellen werden schließlich automatisiert mit dem Tool \emph{sqlmap} gesucht und getestet.
 
 \section{Versuchsablauf}
 
@@ -260,7 +315,7 @@ Findet sqlmap verwundbare Parameter, so werden diese zusammen mit dem genutzten 
 \end{minted}
 \end{listing}
 
-Gelingt es sqlmap nicht, eine SQL"=Injection zu finden, so kann mit \texttt{--level} die Anzahl der getesteten SQL"=Injection"=Varianten erhöhen -- wobei 1 die niedrigste Stufe und 5 jene Stufe mit der größten Zahl an Anfragen darstellt. Neben der Anzahl der möglichen Varianten pro Parameter werden mit höheren Stufen auch Cookies und HTTP"=Header getestet. Die größere Anzahl an Anfragen hat allerdings auch eine längere Ausführungsdauer des Befehls zur Folge.
+Gelingt es sqlmap nicht, eine SQL"=Injection zu finden, so kann mit \texttt{--level} die Anzahl der getesteten SQL"=Injection"=Varianten erhöht werden -- wobei 1 die niedrigste Stufe und 5 jene Stufe mit der größten Zahl an Anfragen darstellt. Neben der Anzahl der möglichen Varianten pro Parameter werden mit höheren Stufen auch Cookies und HTTP"=Header getestet. Die größere Anzahl an Anfragen hat allerdings auch eine längere Ausführungsdauer des Befehls zur Folge.
 
 \begin{listing}[ht!]
 \begin{minted}[breaklines]{bash}
@@ -336,19 +391,19 @@ Als Datenbanksystem wird MySQL eingesetzt. In der kostenpflichtigen Enterprise"=
     \tikzstyle{arrow} = [thick,->,>=stealth]
     \tikzstyle{desc} = [text=black,midway,fill=none,draw=none]
 
-    \node (start) [startstop] {Receive SQL \\ from Client};
-    \node (in1) [process, right of=start, xshift=2cm] {Digest into \\ parser tokens};
+    \node (start) [startstop] {Empfange SQL \\ Abfrage};
+    \node (in1) [process, right of=start, xshift=2cm] {Parsen und in \\ Tokens zerlegen};
     \node (fw) [process, right of=in1, xshift=2cm] {Firewall};
 
-    \node (check) [decision, below of=fw, yshift=-0.5cm] {Check user \\Firewall mode};
-    \node (store) [process, left of=check, xshift=-3cm] {Store SQL \\ in whitelist};
+    \node (check) [decision, below of=fw, yshift=-0.5cm] {Überprüfe User \\Firewall Mode};
+    \node (store) [process, left of=check, xshift=-3cm] {Speichere SQL \\ in Whitelist};
 
-    \node (white) [decision, below of=check, yshift=-0.5cm] {In whitelist? \\};
-    \node (log) [process, below of=white, yshift=-0.5cm] {Log Firewall Alert};
-    \node (decide) [decision, below of=log, yshift=-0.5cm] {Detect or \\ protect mode?};
+    \node (white) [decision, below of=check, yshift=-0.5cm] {In Whitelist? \\};
+    \node (log) [process, below of=white, yshift=-0.5cm] {Logge Firewall Alert};
+    \node (decide) [decision, below of=log, yshift=-0.5cm] {Detect Oder \\ Protect Mode?};
 
-    \node (reject) [startstop,below of=decide, yshift=-0.5cm] {Reject SQL};
-    \node (exec) [startstop,left of=reject, xshift=-3cm] {Execute SQL};
+    \node (reject) [startstop,below of=decide, yshift=-0.5cm] {Lehne SQL ab};
+    \node (exec) [startstop,left of=reject, xshift=-3cm] {Führe SQL aus};
 
     \draw [arrow] (start) -- (in1);
     \draw [arrow] (in1) -- (fw);
@@ -365,7 +420,7 @@ Als Datenbanksystem wird MySQL eingesetzt. In der kostenpflichtigen Enterprise"=
 
 \end{tikzpicture}
 
-\caption[db firewall]{Diese Grafik skizziert die Funktionsweise der MySQL Datenbankfirewall.\footnote{\RaggedRight nach \url{http://dev.mysql.com/doc/refman/5.6/en/firewall.html}} Eingehende SQL"=Anfragen werden geparst und in Tokens zerlegt. Pro Datenbankbenutzer existiert nun eine Whitelist mit zulässigen Abfragen: Ist der Lernmodus aktiv, so werden alle neuen Anfragen in die Whitelist mit aufgenommen. Wird die Firewall aktiviert, so werden neue Anfragen je nach Einstellung nur geloggt oder auch abgelehnt. Entsprechend kann die Datenbankfirewall wieder als IDS oder IDP konfiguriert werden. }
+\caption[db firewall]{Diese Grafik skizziert die Funktionsweise der MySQL Datenbankfirewall.\footnote{\minipagefootnotefix \RaggedRight nach \url{http://dev.mysql.com/doc/refman/5.6/en/firewall.html}} Eingehende SQL"=Anfragen werden geparst und in Tokens zerlegt. Pro Datenbankbenutzer existiert nun eine Whitelist mit zulässigen Abfragen: Ist der Lernmodus aktiv, so werden alle neuen Anfragen in die Whitelist mit aufgenommen. Wird die Firewall aktiviert, so werden neue Anfragen je nach Einstellung nur geloggt oder auch abgelehnt. Entsprechend kann die Datenbankfirewall wieder als IDS oder IDP konfiguriert werden. }
 \label{img:db_firewall}
 \end{margincap}
 \end{figure}
@@ -379,7 +434,20 @@ Statement was blocked by Firewall
 \end{minted}
 \end{listing}
 
+%TODO log files
 
+Im DETECTING Modus werden Queries, die nicht in der Whitelist enthalten sind, im Errorlog von MySQL eingetragen.
+\begin{listing}[ht!]
+\begin{minted}[breaklines]{text}
+2016-06-23T14:42:17.079455Z 543 [Note] Plugin MYSQL_FIREWALL reported: 'SUSPICIOUS STATEMENT from 'root@%'. Reason: No match in whitelist.
+Statement: SELECT * FROM `users` ORDER BY ? AND `SLEEP` (?) '
+\end{minted}
+\end{listing}
+
+
+
+
+Queries, deren Ausführungsdauer eine bestimmte Zeit überschreiten \myothermarginnote{Die Grenze für diese Ausführungsdauer wird in der MySQL Variable \texttt{long\_query\_time} definiert -- standardmäßig liegt sie bei zehn Sekunden.} werden ebenfalls in eine \texttt{<host>\_slow.log} protokolliert. Dies kann bei Time-based SQL"=Injections dazu führen, dass die erzeugten Queries in dieser Logdatei gespeichert werden.
 
 \chapter{Ergebnisse}
 
@@ -396,9 +464,13 @@ Die große Schwierigkeit bei der Datenbankfirewall ist jedoch die Einrichtung de
 \mymarginnote[-2em]{nach \enquote{Muster für die Erklärung nach §\,18 Abs.\,4 Nr.\,7 APO HI}}
 \lettrine{I}{ch erkläre hiermit,} dass ich die Arbeit selbständig verfasst, noch nicht anderweitig für Prüfungszwecke vorgelegt, keine anderen als die angegebenen Quellen oder Hilfsmittel benützt sowie wörtliche und sinngemäße Zitate als solche gekennzeichnet habe.
 
-\vspace{2\baselineskip}
+\vspace{3\baselineskip}
 \noindent Ingolstadt, den \today
-\par\noindent\makebox[2.5in]{} \hfill\makebox[2.0in]{\hrulefill}%
-\par\noindent\makebox[2.5in][l]{} \hfill\makebox[2.0in][l]{{\zapfinofont\huge Stefan Braun}}
+
+\par\noindent\makebox[2.5in]{} \hfill\makebox[2.0in]{\raisebox{-1.1cm}{\tikz{\includegraphics[width=5cm]{imports/sig.png} }}\hrulefill}%
+\\[-1cm]\hspace*{8cm}{{Stefan Braun}}
+
+
+
 
 \end{document}

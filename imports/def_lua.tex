@@ -121,7 +121,7 @@ Prüfer & \emph{Prof. Dr. Stefan Hahndel}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Section font settings
 \addtokomafont{chapter}{\normalfont\rmfamily\Huge\leavevmode\color{documentColor}\lsstyle}
-\addtokomafont{section}{\normalfont\rmfamily\leavevmode\color{documentColor}\scshape\MakeLowercase}
+\addtokomafont{section}{\normalfont\rmfamily\leavevmode\color{documentColor}\lsstyle\scshape\MakeLowercase}
 \addtokomafont{subsection}{\normalfont\rmfamily\leavevmode\color{documentColor}}
 \addtokomafont{subsubsection}{\normalfont\rmfamily\leavevmode\color{documentColor}}
 \addtokomafont{paragraph}{\normalfont\rmfamily\leavevmode\color{documentColor}}
@@ -175,13 +175,22 @@ Prüfer & \emph{Prof. Dr. Stefan Hahndel}
   \marginnote{% needs marginnote package
     \lineskiplimit=-\maxdimen%
     \normalfont\sffamily\footnotesize\color{black!70}%
+    % {\color{documentColor}\hrule height 2pt}
     \justify
     \noindent
     #2
+    % {\\\color{documentColor}\hrule height 2pt}
     }[#1]%
 }
 
+\newcommand\minipagefootnotefix{\normalfont\sffamily\footnotesize\color{black!70}}
+\newcommand\minipagefootnote[1]{\oldfootnote{\minipagefootnotefix #1}}
+
 \newcommand\myothermarginnote[2][0pt]{
+
+  \let\oldfootnote\footnote
+  \let\footnote\minipagefootnote
+
   \marginpar{% needs marginnote package
     \begin{minipage}{\marginparwidth}
     \lineskiplimit=-\maxdimen%
@@ -192,6 +201,7 @@ Prüfer & \emph{Prof. Dr. Stefan Hahndel}
     {#2}
     \end{minipage}
     }%
+    \let\footnote\oldfootnote
 }
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -322,4 +332,6 @@ keepaspectratio]{imports/thi_logo.eps}
   {\sffamily\contentslabel{3em}}{}{}
   {\hspace{0.5em}\nobreak\itshape\color{documentColor}\contentspage}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 

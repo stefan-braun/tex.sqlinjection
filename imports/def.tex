@@ -41,6 +41,7 @@
 \usepackage{pgfplots}
 \usepackage{pgfplotstable}
 \pgfplotsset{compat=newest}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -67,12 +68,15 @@
 \setminted{tabsize=4}
 % \setminted{xleftmargin=-2em}
 % \setminted{obeytabs}
-\setminted{linenos}
-\setminted{bgcolor=listingbackground}
+\setminted{linenos,frame=lines, framesep=\fboxsep, rulecolor=\color{gray!40}}
+\setminted{bgcolor=dhscodebg}
 \setmintedinline{breaklines}
 \setmintedinline{bgcolor={}}
 % \renewcommand{\theFancyVerbLine}{\sffamily\textcolor{documentColor!80}{\scriptsize\oldstylenums{\arabic{FancyVerbLine}}}}
-
+\makeatletter
+\patchcmd{\minted@colorbg}{\noindent}{\medskip\noindent}{}{}
+\apptocmd{\endminted@colorbg}{\par\medskip\vspace{-.7\baselineskip}}{}{}
+\makeatother
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -90,6 +94,8 @@
 \definecolor{tableHeaderText}{RGB}{255,255, 255}
 \definecolor{tableHeader}{RGB}{211, 47, 0}
 \definecolor{listingbackground}{HTML}{F4F4F4}
+\definecolor{dhscodebg}{rgb}{0.95,0.95,0.95}
+\definecolor{mySteelBlue}{HTML}{2A4E6C}
 \definecolor{tableLineOne}{RGB}{245, 245, 245}
 \definecolor{tableLineTwo}{RGB}{224, 224, 224}
 \definecolor{THI-Blue}{RGB}{1,90,156}
@@ -179,7 +185,14 @@ Prüfer & \emph{Prof. Dr. Stefan Hahndel}
     }[#1]%
 }
 
+\newcommand\minipagefootnotefix{\normalfont\sffamily\footnotesize\color{black!70}}
+\newcommand\minipagefootnote[1]{\oldfootnote{\minipagefootnotefix #1}}
+
 \newcommand\myothermarginnote[2][0pt]{
+
+  \let\oldfootnote\footnote
+  \let\footnote\minipagefootnote
+
   \marginpar{% needs marginnote package
     \begin{minipage}{\marginparwidth}
     \lineskiplimit=-\maxdimen%
@@ -190,6 +203,7 @@ Prüfer & \emph{Prof. Dr. Stefan Hahndel}
     {#2}
     \end{minipage}
     }%
+    \let\footnote\oldfootnote
 }
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -250,7 +264,7 @@ keepaspectratio]{imports/thi_logo.eps}
 \renewcommand*{\chaptermarkformat}{}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\usepackage[colorlinks, linkcolor = black, citecolor = black, filecolor = black, urlcolor = black]{hyperref}
+\usepackage[colorlinks, linkcolor = mySteelBlue, citecolor = mySteelBlue, filecolor = mySteelBlue, urlcolor = mySteelBlue]{hyperref}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % begin of the document
