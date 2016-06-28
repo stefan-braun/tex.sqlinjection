@@ -1,0 +1,43 @@
+\documentclass[margin=0.3cm]{standalone}
+\usepackage{tikz}
+\usepackage{datatool}
+\usepackage{pgfplots}
+\usetikzlibrary{arrows.meta}
+
+\pgfplotsset{compat=1.13}
+
+
+
+\pgfplotsset{ytick style={draw=none}}
+\def\axisdefaultwidth{9cm}
+\def\axisdefaultheight{6cm}
+\pgfplotsset{every axis/.style={scale only axis}}
+\DTLsettabseparator
+\DTLloaddb[noheader=false]{coordinates1}{sa.tex}
+\DTLmaketabspace
+
+
+\usepackage{pgfplotstable}
+\begin{document}
+
+\begin{tikzpicture}
+\begin{axis}[compat=newest, xlabel=Premixed air flow rate (SLPM), ylabel=$p'_{rms}$ (Pa),xtick pos=left,ybar=0]
+\pgfplotstableread{sa.tex} \mydata;
+\addplot[mark options={blue,solid},mark=*,only marks] table [x = x, y =y] {\mydata};
+\pgfplotsextra{
+\def\xA{0}
+\def\yA{0}
+\DTLforeach*{coordinates1}{\xB=x, \yB=y}{%
+    \DTLiffirstrow{
+    }{
+    \draw[-latex,shorten >=0.05cm,] (axis cs:\xA,\yA) -- (axis cs:\xB,\yB);
+    }
+    \let\xA\xB
+    \let\yA\yB
+}
+}
+\end{axis}
+
+
+\end{tikzpicture}
+\end{document}

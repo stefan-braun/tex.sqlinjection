@@ -1,6 +1,5 @@
 %!TEX root = ../document.tex
 \documentclass{tufte-book}
-\usepackage{scrhack}
 \usepackage[utf8]{inputenc}
 \usepackage[ngerman]{babel}
 \usepackage{inconsolata}
@@ -36,8 +35,6 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %bib
-\usepackage[backend=biber,style=alphabetic,hyperref=true,backref=true,block=none,maxcitenames=3,maxbibnames=100]{biblatex}
-\addbibresource{imports/references.bib}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -93,7 +90,7 @@
 %Titel
 \title{Netzwerkforensik: Erkennung von SQL-Injections}
 %\publishers{TH Ingolstadt}
-\subtitle{Computerforensik}
+% \subtitle{Computerforensik}
 \author{Stefan Braun}
 \date{23. Mai 2016}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -132,6 +129,9 @@
 % \renewcommand{\raggedleftmarginnote}{\justified}
 % \renewcommand{\raggedrightmarginnote}{\justified}
 \newcommand\mymarginnote[2][0pt]{
+	\sidenote{#2}
+}
+\newcommand\myothermarginnote[2][0pt]{
 	\sidenote{#2}
 }
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -197,8 +197,7 @@
 
 % }
 
-\renewcommand{\tableofcontents}{}
-\renewcommand{\rowfont}{}
+\newcommand{\rowfont}{}
 \maketitle
 
 %\clearpage
@@ -209,3 +208,4 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
+\newenvironment{margincap}{}{}

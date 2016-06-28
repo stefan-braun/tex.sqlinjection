@@ -1,7 +1,7 @@
 %!TEX options = --shell-escape
 %!TEX program = pdflatex
 
-\input{imports/def}
+\input{imports/tufte_def}
 
 
 \colorlet{documentColor}{darkred}
@@ -38,14 +38,9 @@
 \label{tab:owasp_top_ten}
 \centering
 \begin{tabu} to \textwidth {l l X<{\strut} l}
-	\rowfont{\sffamily\bfseries\leavevmode\color{tableHeaderText}}
-	\rowcolor{tableHeader}
 	& & Kategorie & \\
-	\rowfont{\sffamily}
 	& 1 & Injection & \\
-	\rowfont{\sffamily}
 	& 2 & Broken Authentication & \\
-	\rowfont{\sffamily}
 	& 3 & Cross-Site-Scripting & \\
 \end{tabu}
 \end{margincap}
@@ -268,6 +263,10 @@ Je eines der Beiden zu 100\% zu erfüllen ist einfach: \emph{false positives} we
 
 Bezugnehmend auf die Abbildung \ref{img:protected_server_arch} wird jeweils eine Web Application Firewall und eine Database Firewall getestet. Damit diese Tests möglich sind, muss zum einen die grundlegende Infrastruktur aufgebaut werden: Die Basis bildet ein Apache\,2.4 Webserver auf einem Linux"=Serversystem.\mymarginnote[-1em]{Zum Einsatz kommt ein 64"=bit Ubuntu Server. Siehe auch {\url{http://www.ubuntu.com/download/server}}} Damit Angriffe möglich sind, muss eine für SQL"=Injections verwundbare Applikation eingerichtet werden. Mögliche Schwachstellen werden schließlich automatisiert mit dem Tool \emph{sqlmap} gesucht und getestet.
 
+\section{Versuchsablauf}
+
+Schwachstellen, die mit sqlmap entdeckt wurden, werden als \texttt{Request} Objekte in einem Pythonskript zusammengefasst. Anschließend wird je eine der beiden Abwehrmaßnahmen aktiviert. Das Pythonskript führt die Requests der Reihe nach aus und überprüft ob die SQL"=Injection erfolgreich abgefangen wurde. Abschließend wird eine Statistik der erfolgreichen und der abgewehrten SQL"=Injections ausgegeben.
+
 
 \section{Automatisierung der SQL-Injections mit sqlmap}
 
@@ -399,7 +398,7 @@ Als Datenbanksystem wird MySQL eingesetzt. In der kostenpflichtigen Enterprise"=
 
     \node (white) [decision, below of=check, yshift=-0.5cm] {In Whitelist? \\};
     \node (log) [process, below of=white, yshift=-0.5cm] {Logge Firewall Alert};
-    \node (decide) [decision, below of=log, yshift=-0.5cm] {Detect oder \\ Protect Mode?};
+    \node (decide) [decision, below of=log, yshift=-0.5cm] {Detect Oder \\ Protect Mode?};
 
     \node (reject) [startstop,below of=decide, yshift=-0.5cm] {Lehne SQL ab};
     \node (exec) [startstop,left of=reject, xshift=-3cm] {Führe SQL aus};
@@ -409,12 +408,12 @@ Als Datenbanksystem wird MySQL eingesetzt. In der kostenpflichtigen Enterprise"=
     \draw [arrow] (fw) -- (check);
     \draw [arrow] (check) -- (store) node[desc,xshift=0.7cm,yshift=0.6cm]{Recording};
     \draw [arrow] (check) -- (white) node[desc,xshift=1.5cm,yshift=0cm]{Protect / Detect};
-    \draw [arrow] (white) -- (log) node[desc,xshift=0.4cm,yshift=0cm]{Nein};
+    \draw [arrow] (white) -- (log) node[desc,xshift=0.4cm,yshift=0cm]{No};
     \draw [arrow] (log) -- (decide);
     \draw [arrow] (decide) -- (reject) node[desc,xshift=0.7cm,yshift=0cm]{Protect};
     \draw [arrow] (decide) -| (exec) node[desc,near start,xshift=0.7cm,yshift=0.4cm]{Detect};
     \draw [arrow] (store) -- (exec);
-    \draw [arrow] (white) -| (exec) node[desc,near start,xshift=0.7cm,yshift=0.4cm]{Ja};
+    \draw [arrow] (white) -| (exec) node[desc,near start,xshift=0.7cm,yshift=0.4cm]{Yes};
     \draw [arrow] (check.east) -- ([xshift=0.5cm]check.east)   node[desc,xshift=0cm,yshift=0.5cm]{Off}|- ([yshift=-0.5cm]exec.south) -- (exec.south);
 
 \end{tikzpicture}
@@ -448,38 +447,18 @@ Statement: SELECT * FROM `users` ORDER BY ? AND `SLEEP` (?) '
 
 Queries, deren Ausführungsdauer eine bestimmte Zeit überschreiten \myothermarginnote{Die Grenze für diese Ausführungsdauer wird in der MySQL Variable \texttt{long\_query\_time} definiert -- standardmäßig liegt sie bei zehn Sekunden.} werden ebenfalls in eine \texttt{<host>\_slow.log} protokolliert. Dies kann bei Time-based SQL"=Injections dazu führen, dass die erzeugten Queries in dieser Logdatei gespeichert werden.
 
-
-\section{Versuchsablauf}
-
-Schwachstellen, die mit sqlmap entdeckt wurden, werden als \texttt{Request} Objekte in einem Pythonskript zusammengefasst. Anschließend wird je eine der beiden Abwehrmaßnahmen aktiviert. Das Pythonskript führt die insgesamt 90 Requests der Reihe nach aus und überprüft ob die SQL"=Injection erfolgreich abgefangen wurde. Abschließend wird eine Statistik der erfolgreichen und der abgewehrten SQL"=Injections ausgegeben. Die Überprüfung erfolgt bei ModSecurity anhand des HTTP"=Statuscodes. Die Tests mit der MySQL Enterprise Datenbankfirewall wurden so modifiziert, dass sie bei einer erkannten SQL"=Injection eine entsprechende Warnung im HTML ausgeben.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 \chapter{Ergebnisse}
 
-\lettrine{D}{ie gute Nachricht} vorweg: Sowohl ModSecurity als auch die Datenbankfirewall erkannten jeweils 90 von 90 Angriffen, was eine Erkennungsrate von 100\% ergibt. Nicht getestet wurde auf \emph{false positives}. Es ist jedoch davon auszugehen, dass die Datenbankfirewall konstruktionsbedingt keine Fehler dieser Art verursacht. Anders ist die Situation bei dem regelbasierten ModSecurity: Hier es durchaus möglich, dass im Kontext zu einer spezifischen Query \enquote{harmlose} Anfragen abgelehnt werden. Auch war es bei ModSecurity möglich, Anfragen derart zu konstruieren, sodass ModSecurity diese \emph{nicht} abgelehnt hat, aber die entstehende Query syntaktisch falsch war.
+90 von 90,
 
-Die große Schwierigkeit bei der Datenbankfirewall ist wiederum die Einrichtung der Whitelist. Bei großen Applikationen mit dynamischen oder von Frameworks erstellten Datenbankabfragen steigt entsprechend der Aufwand, da alle legitimen Queries mindestens einmal aufgerufen werden müssen. Insbesondere ORM"=Frameworks wie Hibernate sind an dieser Stelle zu nennen.
+keine 100% bei ModSecurity "1' or' "
 
-Da das Ergebnis aus Sicht eines Angreifers etwas unbefriedigend erscheinen mag, wurde abschließend getestet, ob sich die Filterregeln von ModSecurity umgehen lassen. Hierbei wurde mit verschiedenen Informationskanälen getestet, ob die Filterregeln von ModSecurity anschlagen. Hierzu wurde der String \texttt{' OR ' = ''} in Parametern, Cookies und HTTP"=Headern eingesetzt. Dies ergab, dass ModSecurity GET"=Parameter, POST"=Parameter und Cookies auf Muster von SQL"=Injections hin untersucht. Nicht blockiert wurden Anfragen, die diesen String in den HTTP"=Headern enthielten -- etwa der UserAgent oder der Referrer. Inhalte von im Request enthaltenen Dateien werden ebenso wenig erkannt wie Base64"=kodierte Parameter. An dieser Stelle wäre vermutlich eine Erweiterung der Filterregeln notwendig.
+Die große Schwierigkeit bei der Datenbankfirewall ist jedoch die Einrichtung der Whitelist. Bei großen Applikationen mit dynamischen oder von Frameworks erstellten Datenbankabfragen steigt entsprechend der Aufwand, da alle legitimen Queries mindestens einmal aufgerufen werden müssen.
 
 \printbibliography
 
 
-\chapter*{Erkl{\huge Ä}rung}
+\chapter*{Erklärung}
 \mymarginnote[-2em]{nach \enquote{Muster für die Erklärung nach §\,18 Abs.\,4 Nr.\,7 APO HI}}
 \lettrine{I}{ch erkläre hiermit,} dass ich die Arbeit selbständig verfasst, noch nicht anderweitig für Prüfungszwecke vorgelegt, keine anderen als die angegebenen Quellen oder Hilfsmittel benützt sowie wörtliche und sinngemäße Zitate als solche gekennzeichnet habe.
 
