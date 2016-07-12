@@ -94,7 +94,7 @@
 \definecolor{tableHeaderText}{RGB}{255,255, 255}
 \definecolor{tableHeader}{RGB}{211, 47, 0}
 \definecolor{listingbackground}{HTML}{F4F4F4}
-\definecolor{dhscodebg}{rgb}{0.95,0.95,0.95}
+\definecolor{dhscodebg}{rgb}{0.97,0.97,0.97}
 \definecolor{mySteelBlue}{HTML}{2A4E6C}
 \definecolor{tableLineOne}{RGB}{245, 245, 245}
 \definecolor{tableLineTwo}{RGB}{224, 224, 224}
@@ -157,6 +157,10 @@ Prüfer & \emph{Prof. Dr. Stefan Hahndel}
 % \captionsetup{
 %   labelsep=newlinesep
 % }
+
+% feste Länge für das leerzeichen zwischen label und nummer
+\DeclareCaptionLabelFormat{constantsep}{\bothIfFirst{#1}{\,}#2}
+\captionsetup{labelformat=constantsep}
 \usepackage{mcaption}
 \usepackage{float}
 \usepackage{ragged2e}
@@ -175,8 +179,8 @@ Prüfer & \emph{Prof. Dr. Stefan Hahndel}
 \usepackage{marginnote}
 % \renewcommand{\raggedleftmarginnote}{\justified}
 % \renewcommand{\raggedrightmarginnote}{\justified}
-\newcommand\mymarginnote[2][0pt]{
-  \marginnote{% needs marginnote package
+\newcommand\mymarginnote[2][0pt]{%
+\marginnote{% needs marginnote package
     \lineskiplimit=-\maxdimen%
     \normalfont\sffamily\footnotesize\color{black!70}%
     \justify
@@ -188,12 +192,10 @@ Prüfer & \emph{Prof. Dr. Stefan Hahndel}
 \newcommand\minipagefootnotefix{\normalfont\sffamily\footnotesize\color{black!70}}
 \newcommand\minipagefootnote[1]{\oldfootnote{\minipagefootnotefix #1}}
 
-\newcommand\myothermarginnote[2][0pt]{
-
-  \let\oldfootnote\footnote
-  \let\footnote\minipagefootnote
-
-  \marginpar{% needs marginnote package
+\newcommand\myothermarginnote[2][0pt]{%
+\let\oldfootnote\footnote%
+\let\footnote\minipagefootnote%
+\marginpar{% needs marginnote package
     \begin{minipage}{\marginparwidth}
     \lineskiplimit=-\maxdimen%
     \normalfont\sffamily\footnotesize\color{black!70}%
@@ -203,7 +205,7 @@ Prüfer & \emph{Prof. Dr. Stefan Hahndel}
     {#2}
     \end{minipage}
     }%
-    \let\footnote\oldfootnote
+\let\footnote\oldfootnote%
 }
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -335,3 +337,19 @@ keepaspectratio]{imports/thi_logo.eps}
   {\hspace{0.5em}\nobreak\itshape\color{documentColor}\contentspage}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+
+
+% Listing statt Abbildung in listoflistings
+\usepackage{etoolbox}
+\addto\captionsngerman{%
+  \renewcommand{\listlistingname}{Quellcodeverzeichnis}% <--- ??
+  \renewcommand{\listingname}{Listing}% <--- ??
+}
+\makeatletter
+\let\l@listing\l@figure
+\patchcmd{\l@listing}{\cftfigpresnum}{\cftlistingpresnum}{}{}
+\newcommand\cftlistingpresnum{\listingname~}
+\makeatother
+\KOMAoption{listof}{nochaptergap}
+\KOMAoption{listof}{nonumberline}

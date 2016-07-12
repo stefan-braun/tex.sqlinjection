@@ -1,0 +1,183 @@
+%%
+%% This is file `title-WWUM.def',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% titlepage.dtx  (with options: `driver,WWUM')
+%% Copyright (c) 2011-2016 by Markus Kohm <komascript(at)gmx.info>
+%% 
+%% This file was generated from file(s) of titlepage distribution.
+%% ----------------------------------------------------------------------
+%% 
+%% This work may be distributed and/or modified under the conditions of
+%% the LaTeX Project Public License, version 1.3c of the license.
+%% The latest version of this license is in
+%%   http://www.latex-project.org/lppl.txt
+%% and version 1.3c or later is part of all distributions of LaTeX
+%% version 2005/12/01 or later.
+%% 
+%% This work has the LPPL maintenance status "maintained".
+%% 
+%% The Current Maintainer and author of this work is Markus Kohm.
+%% 
+%% This file may only be distributed together with the file
+%% `titlepage.dtx'. You may however distribute the file `titlepage.dtx'
+%% without this file.
+%% 
+%% NOTE: THIS IS AN ALPHA-VERSION!
+\ProvidesFile{%
+  title%
+  -WWUM%
+ .def%
+}[%
+  2016/06/22 v0.5a
+  KOMA presents the title page project
+]
+
+\begingroup
+  \def\PackageNotLoadedError#1{%
+    \GenericError{%
+      (#1)\@spaces\@spaces\@spaces\@spaces
+    }{%
+      File `#1' Error: package `titlepage' hasn't been loaded%
+    }{%
+      This definition file was made to be loaded by package
+      `titlepage'.\MessageBreak
+      You may not use it without package `titlepage'!\MessageBreak
+      See the documentation of package `titlepage' for explanation.%
+    }%
+  }%
+  \ifx\csname titlepage.sty@vers\endcsname\relax
+    \PackageNotLoadedError{%
+      title-WWUM.def%
+    }%
+  \fi
+\endgroup
+\DefineFamilyMember[%
+  WWUM%
+]{title}
+\providecommand*{\presentationinformationWWUM}{%
+  \@subject\\
+  to the Aquisition of the Academic Degree\\
+  \@degree\\
+  of the \@sience{} of \@discipline\\
+  of the \@facilty{} faculty\\
+  of the \@university
+}
+\providecaptionname{american,australian,british,canadian,%
+  english,newzealand,UKenglish,USenglish}{\presentationinformationWWUM}{%
+  \@subject\\
+  to the Aquisition of the Academic Degree\\
+  \@degree\\
+  of the \@sience{} of \@discipline\\
+  of the \@facilty{} faculty\\
+  of the \@university
+}
+\providecaptionname{german,ngerman,austrian,naustrian,%
+  swissgerman,nswissgerman}{\presentationinformationWWUM}{%
+  \@subject\\
+  zur Erlangung des \@degree\\
+  der \@sience{} im Fachbereich \@discipline\\
+  der \@faculty{} Fakult\"at\\
+  der \@university
+}
+\scr@ifundefinedorrelax{captionsgerman}{}{%
+  \renewcaptionname{german}{\presentedbyname}{vorgelegt von}%
+}
+\scr@ifundefinedorrelax{captionsngerman}{}{%
+  \renewcaptionname{ngerman}{\presentedbyname}{vorgelegt von}%
+}
+\scr@ifundefinedorrelax{captionsaustrian}{}{%
+  \renewcaptionname{austrian}{\presentedbyname}{vorgelegt von}%
+}
+\scr@ifundefinedorrelax{captionsnaustrian}{}{%
+  \renewcaptionname{naustrian}{\presentedbyname}{vorgelegt von}%
+}
+\scr@ifundefinedorrelax{captionsswissgerman}{}{%
+  \renewcaptionname{swissgerman}{\presentedbyname}{vorgelegt von}%
+}
+\scr@ifundefinedorrelax{captionsnswissgerman}{}{%
+  \renewcaptionname{nswissgerman}{\presentedbyname}{vorgelegt von}%
+}
+\renewcommand*{\inittitle}{%
+  \ifx\@university\@empty
+    \university{%
+      Westf\"alischen Wilhelms-Universit\"at M\"unster%
+    }%
+  \fi
+  \ifx\@place\@empty
+    \place{%
+      \PackageWarning{titlepage}{birth place missing.\MessageBreak
+        Style `WWUM' needs the birth place of\MessageBreak
+        the student}%
+    }
+  \fi
+  \ifx\@titlepagefont\@empty
+    \renewcommand*{\@titlepagefont}{\normalfont\large}%
+  \fi
+}
+\renewcommand*{\makemaintitle}{%
+  \begin{%
+    titlepage}
+    \setlength{\parskip}{\z@}%
+    \setlength{\parindent}{\z@}%
+    \setlength{\parfillskip}{\z@\@plus 1fil}%
+    \linespread{1}\selectfont
+    \@titlepagefont
+    \centering
+    \@chair\\
+    \vspace{2cm}
+    \@title\\
+    \vfill
+    \presentationinformationWWUM\\
+    \vfill
+    \presentedbyname\\
+    \@author\\
+    \ifx\@place\@empty\else\fromplacename{} \@place\\\fi
+    --\,\the\year\,--
+  \end{%
+    titlepage}
+}
+\renewcommand*{\makemaintitleback}{%
+  \begin{titlepage}
+    \vspace*{\fill}
+    \noindent
+    \@tempcnta\z@
+    \def\arraystretch{2}%
+    \newcommand*{\test@malefemale}[1][m]{%
+      \global\advance\@tempcnta by\@ne
+      \ifstr{##1}{f}{\def\fe@male{female}}{\def\fe@male{male}}%
+      \csname \fe@male ordinal\endcsname{\@tempcnta}\space
+      \csname \fe@male refereename\endcsname: &
+      \def\and{\\\test@malefemale}%
+    }%
+    \begin{tabular}{@{}ll@{}}
+      \chairmanname: & \@professor \\
+      \expandafter\test@malefemale
+      \@referee \\
+      \oralexaminationdatename: & \@oralexaminationdate
+      \ifx\examinationdatename\@empty\else
+        \\\examinationdatename:     &
+      \fi
+      \\
+    \end{tabular}
+  \end{titlepage}
+}
+\renewcommand*{\makepretitle}{%
+  \begin{fullsizetitle}
+    \@titlepagefont
+    \vspace*{.33\vsize}%
+
+    \centering
+    \@author\\[1ex]
+    \@title\\[1ex]
+    \the\year
+  \end{fullsizetitle}
+}
+\renewcommand*{\makepretitleback}{%
+  \if@twoside\begin{titlepage}\null\end{titlepage}\fi
+}
+\endinput
+%%
+%% End of file `title-WWUM.def'.
